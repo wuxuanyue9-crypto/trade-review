@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交易复盘</title>
+<style>
+:root {
+  --bg: #f5f7fa;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-light: #6b7280;
+  --border: #e5e7eb;
+  --primary: #6366f1;
+  --primary-light: #eef2ff;
+  --green: #10b981;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --radius: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 15px;
+}
+.container { max-width: 960px; margin: 0 auto; padding: 20px 16px 60px; }
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.header h1 { font-size: 24px; font-weight: 700; }
+.header .date { color: var(--text-light); font-size: 14px; }
+.nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav button {
+  padding: 8px 16px;
+  border: none;
+  background: var(--card-bg);
+  color: var(--text-light);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+}
+.nav button.active { background: var(--primary); color: #fff; }
+.nav button:hover:not(.active) { background: var(--primary-light); color: var(--primary); }
+
+/* Card */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .icon { font-size: 20px; }
+
+/* Form */
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 6px;
+}
+.form-group label .required { color: var(--red); }
+input, select, textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+textarea { resize: vertical; min-height: 80px; }
+
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.form-row .form-group { flex: 1; min-width: 140px; }
+
+/* Checkbox group */
+.check-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.check-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.check-item.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+.check-item input { display: none; }
+
+/* Button */
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #5558e0; }
+.btn-primary:disabled { background: #c7d0fd; cursor: not-allowed; }
+.btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { background: var(--bg); }
+.btn-danger { background: #fff; color: var(--red); border: 1px solid #fecaca; }
+.btn-danger:hover { background: #fef2f2; }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 10px 8px; color: var(--text-light); font-weight: 600; border-bottom: 2px solid var(--border); }
+td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+tr:hover { background: #f9fafb; }
+
+/* Tag */
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.tag-green { background: #d1fae5; color: #065f46; }
+.tag-red { background: #fee2e2; color: #991b1b; }
+.tag-yellow { background: #fef3c7; color: #92400e; }
+.tag-blue { background: #dbeafe; color: #1e40af; }
+
+/* AI Recommend */
+.ai-box {
+  background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
+  border: 1px solid #c7d2fe;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.ai-box h3 { font-size: 15px; color: var(--primary); margin-bottom: 12px; }
+.ai-box .ai-section { margin-bottom: 12px; }
+.ai-box .ai-label { font-size: 12px; font-weight: 700; color: var(--text-light); text-transform: uppercase; margin-bottom: 4px; }
+.ai-box .ai-content { font-size: 14px; color: var(--text); }
+.ai-box .ai-content ul { margin-left: 20px; margin-top: 4px; }
+
+/* Empty state */
+.empty { text-align: center; padding: 40px 20px; color: var(--text-light); }
+.empty .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* Tabs within page */
+.sub-tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.sub-tab {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sub-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* Trade log entry */
+.trade-entry {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fafbfc;
+}
+.trade-entry .trade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.trade-entry .trade-name { font-weight: 600; font-size: 15px; }
+.trade-entry .trade-meta { font-size: 13px; color: var(--text-light); }
+
+/* Stat grid */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: var(--card-bg);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-card .stat-value { font-size: 24px; font-weight: 700; }
+.stat-card .stat-label { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+.stat-card.green .stat-value { color: var(--green); }
+.stat-card.red .stat-value { color: var(--red); }
+
+/* Loading */
+.loading { text-align: center; padding: 60px 20px; color: var(--text-light); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container { padding: 12px 10px 40px; }
+  .card { padding: 16px; }
+  .header h1 { font-size: 20px; }
+  .nav button { padding: 6px 12px; font-size: 13px; }
+  .form-row { flex-direction: column; }
+  .form-row .form-group { min-width: 100%; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  table { font-size: 12px; }
+  th, td { padding: 6px 4px; }
+}
+
+/* Hidden */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>📋 交易复盘</h1>
+      <div class="date" id="todayDate"></div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" data-page="daily">日复盘</button>
+      <button class="nav-btn" data-page="trades">交易日志</button>
+      <button class="nav-btn" data-page="weekly">周复盘</button>
+      <button class="nav-btn" data-page="monthly">月复盘</button>
+      <button class="nav-btn" data-page="stats">数据总览</button>
+    </div>
+  </div>
+
+  <!-- ========== 日复盘 ========== -->
+  <div id="page-daily" class="page">
+    <!-- AI推荐 -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🤖</span> AI复盘参考（基于老冯方法论）</div>
+      <div id="aiRecommend" class="ai-box">
+        <p style="color:var(--text-light)">填写下方市场数据后，点击"生成AI推荐"</p>
+      </div>
+      <button class="btn btn-primary" onclick="generateAIRecommend()">🔄 生成AI推荐</button>
+    </div>
+
+    <!-- 市场数据 -->
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span> 市场数据</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>日期</label>
+          <input type="date" id="dailyDate">
+        </div>
+        <div class="form-group">
+          <label>大盘状态</label>
+          <select id="dailyMarket">
+            <option value="">选择</option>
+            <option value="OK">OK（可交易）</option>
+            <option value="CAUTION">CAUTION（谨慎）</option>
+            <option value="CRASH">CRASH（不交易）</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>深证综指收盘</label>
+          <input type="number" id="dailyIdxClose" placeholder="如1920.5" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>20日线位置</label>
+          <input type="number" id="dailyIdxMA20" placeholder="如1900.0" step="0.1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>涨停家数</label>
+          <input type="number" id="dailyLimitUp" placeholder="如35">
+        </div>
+        <div class="form-group">
+          <label>跌停家数</label>
+          <input type="number" id="dailyLimitDown" placeholder="如5">
+        </div>
+        <div class="form-group">
+          <label>两市成交额(亿)</label>
+          <input type="number" id="dailyTurnover" placeholder="如12000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>强势板块（涨幅前5）</label>
+        <input type="text" id="dailyStrongSectors" placeholder="如：存储、半导体设备、AI、汽车、军工">
+      </div>
+      <div class="form-group">
+        <label>情绪标记</label>
+        <div class="check-group" id="dailyEmotion">
+          <label class="check-item"><input type="radio" name="emotion" value="平稳">平稳</label>
+          <label class="check-item"><input type="radio" name="emotion" value="冲动">冲动</label>
+          <label class="check-item"><input type="radio" name="emotion" value="焦虑">焦虑</label>
+          <label class="check-item"><input type="radio" name="emotion" value="贪心">贪心</label>
+          <label class="check-item"><input type="radio" name="emotion" value="恐惧">恐惧</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 今日操作 -->
+    <div class="card">
+      <div class="card-title"><span class="icon">✅</span> 今日操作</div>
+      <div id="dailyOpsContainer">
+        <div class="trade-entry" id="dailyOp0">
+          <div class="trade-header">
+            <select style="width:auto" class="op-type">
+              <option value="">操作类型</option>
+              <option value="买入">买入</option>
+              <option value="卖出">卖出</option>
+              <option value="止损">止损</option>
+              <option value="止盈">止盈</option>
+              <option value="无操作">无操作</option>
+            </select>
+            <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="this.parentElement.parentElement.remove()">删除</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>代码</label><input type="text" class="op-code" placeholder="如301308"></div>
+            <div class="form-group"><label>名称</label><input type="text" class="op-name" placeholder="如江波龙"></div>
+            <div class="form-group"><label>价格</label><input type="number" class="op-price" step="0.01"></div>
+            <div class="form-group"><label>数量</label><input type="number" class="op-shares"></div>
+          </div>
+          <div class="form-group"><label>理由</label><input type="text" class="op-reason" placeholder="操作理由"></div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="addDailyOp()">+ 添加操作</button>
+    </div>
+
+    <!-- 持仓快照 -->
+    <div class="card">
+      <div class="card-title"><span class="icon">📦</span> 持仓快照</div>
+      <div class="form-row">
+        <div class="form-group"><label>持仓只数</label><input type="number" id="posCount" placeholder="如2"></div>
+        <div class="form-group"><label>总仓位(%)</label><input type="number" id="posTotalPct" step="0.1" placeholder="如20"></div>
+        <div class="form-group"><label>总盈亏(元)</label><input type="number" id="posPnl" step="0.01" placeholder="如5000"></div>
+        <div class="form-group"><label>总盈亏(R)</label><input type="number" id="posPnlR" step="0.01" placeholder="如0.5"></div>
+      </div>
+    </div>
+
+    <!-- 明日关注 -->
+    <div class="card">
+      <div class="card-title"><span class="icon">👀</span> 明日关注列表</div>
+      <div id="watchlistContainer">
+        <div class="trade-entry" id="watch0">
+          <div class="form-row">
+            <div class="form-group"><label>代码</label><input type="text" class="wl-code" placeholder="如688012"></div>
+            <div class="form-group"><label>名称</label><input type="text" class="wl-name" placeholder="如中微公司"></div>
+            <div class="form-group"><label>触发价</label><input type="number" class="wl-trigger" step="0.01"></div>
+            <div class="form-group"><label>止损价</label><input type="number" class="wl-stop" step="0.01"></div>
+            <div class="form-group"><label>目标价</label><input type="number" class="wl-target" step="0.01"></div>
+          </div>
+          <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="this.parentElement.remove()">删除</button>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="addWatchlist()">+ 添加关注</button>
+    </div>
+
+    <!-- 心得 -->
+    <div class="card">
+      <div class="card-title"><span class="icon">💡</span> 今日复盘心得</div>
+      <textarea id="dailyNote" placeholder="一句话总结今天的交易"></textarea>
+    </div>
+
+    <!-- 执行检查 -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🔒</span> 执行检查</div>
+      <div class="check-group" id="dailyExecChecks">
+        <label class="check-item"><input type="checkbox" value="all-planned"> 所有操作按计划执行</label>
+        <label class="check-item"><input type="checkbox" value="no-violation"> 无违规操作</label>
+        <label class="check-item"><input type="checkbox" value="stop-loss-set"> 止损单已挂好</label>
+        <label class="check-item"><input type="checkbox" value="no-chase"> 没有追高</label>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px">
+      <button class="btn btn-primary" style="padding:12px 48px;font-size:16px" onclick="saveDaily()">💾 保存日复盘</button>
+    </div>
+  </div>
+
+  <!-- ========== 交易日志 ========== -->
+  <div id="page-trades" class="page hidden">
+    <div class="sub-tabs">
+      <button class="sub-tab active" data-sub="trade-new">新增交易日志</button>
+      <button class="sub-tab" data-sub="trade-list">历史交易</button>
+    </div>
+
+    <div id="sub-trade-new">
+      <div class="card">
+        <div class="card-title"><span class="icon">📝</span> 单笔交易日志</div>
+        <div class="form-row">
+          <div class="form-group"><label>股票代码</label><input type="text" id="tCode" placeholder="如301308"></div>
+          <div class="form-group"><label>股票名称</label><input type="text" id="tName" placeholder="如江波龙"></div>
+          <div class="form-group"><label>板块/行业</label><input type="text" id="tSector" placeholder="如存储"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>入场日期</label><input type="date" id="tEntryDate"></div>
+          <div class="form-group"><label>出场日期</label><input type="date" id="tExitDate"></div>
+          <div class="form-group"><label>持股天数</label><input type="number" id="tHoldDays" placeholder="如3"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>买入价</label><input type="number" id="tEntryPrice" step="0.01"></div>
+          <div class="form-group"><label>数量</label><input type="number" id="tShares"></div>
+          <div class="form-group"><label>仓位(%)</label><input type="number" id="tPositionPct" step="0.1"></div>
+          <div class="form-group"><label>R金额(1R)</label><input type="number" id="tRAmount" step="0.01" placeholder="如7000"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>止损价</label><input type="number" id="tStopLoss" step="0.01"></div>
+          <div class="form-group"><label>止损距离(%)</label><input type="number" id="tStopPct" step="0.1" placeholder="如7"></div>
+          <div class="form-group"><label>目标价</label><input type="number" id="tTarget" step="0.01"></div>
+          <div class="form-group"><label>盈亏比</label><input type="number" id="tRR" step="0.1" placeholder="如2.5"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🎯</span> 入场理由（逐项确认）</div>
+        <div class="check-group" id="entryReasons">
+          <label class="check-item"><input type="checkbox" value="surge3d"> 放量上涨3天+涨≥20%</label>
+          <label class="check-item"><input type="checkbox" value="pullback15"> 从高点回调≥15%</label>
+          <label class="check-item"><input type="checkbox" value="hh60min"> 60分钟出现HH</label>
+          <label class="check-item"><input type="checkbox" value="support"> 日线水平支撑位</label>
+          <label class="check-item"><input type="checkbox" value="sector"> 板块联动≥60%</label>
+          <label class="check-item"><input type="checkbox" value="market-ok"> 大盘非CRASH</label>
+          <label class="check-item"><input type="checkbox" value="space14"> 到前高空间≥14%</label>
+          <label class="check-item"><input type="checkbox" value="in-watchlist"> 在自选股中</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">📈</span> Al Brooks 信号描述</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>信号bar类型</label>
+            <select id="tSignalBar">
+              <option value="">选择</option>
+              <option value="反转bar">反转bar</option>
+              <option value="十字星">十字星</option>
+              <option value="强趋势bar">强趋势bar</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>入场bar</label>
+            <select id="tEntryBar">
+              <option value="">选择</option>
+              <option value="突破信号bar高点">突破信号bar高点</option>
+              <option value="回调企稳后买入">回调企稳后买入</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>60分钟结构</label>
+            <select id="t60min">
+              <option value="">选择</option>
+              <option value="HH出现">HH出现</option>
+              <option value="HL出现">HL出现</option>
+              <option value="LL出现">LL出现</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🏁</span> 出场记录</div>
+        <div class="form-row">
+          <div class="form-group"><label>出场价</label><input type="number" id="tExitPrice" step="0.01"></div>
+          <div class="form-group"><label>盈亏金额(元)</label><input type="number" id="tPnl" step="0.01"></div>
+          <div class="form-group"><label>盈亏(R)</label><input type="number" id="tPnlR" step="0.01"></div>
+        </div>
+        <div class="form-group">
+          <label>出场原因</label>
+          <select id="tExitReason">
+            <option value="">选择</option>
+            <option value="止损">止损(-1R)</option>
+            <option value="止盈">止盈(到前高下方1%)</option>
+            <option value="移动止损">移动止损</option>
+            <option value="时间止损3天">时间止损3天</option>
+            <option value="时间止损5天">时间止损5天清仓</option>
+            <option value="手动平仓">手动平仓</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🔍</span> 复盘</div>
+        <div class="form-group">
+          <label>信号判断准确度</label>
+          <select id="tAccuracy">
+            <option value="">选择</option>
+            <option value="完全正确">完全正确</option>
+            <option value="基本正确">基本正确</option>
+            <option value="有误">有误</option>
+            <option value="严重失误">严重失误</option>
+          </select>
+        </div>
+        <div class="form-group"><label>最值得记录的一点</label><textarea id="tHighlight" placeholder="这笔交易最值得记住的是什么？"></textarea></div>
+        <div class="form-group"><label>下次改进</label><textarea id="tImprove" placeholder="下次怎么做更好？"></textarea></div>
+      </div>
+
+      <div style="text-align:center;margin-top:24px">
+        <button class="btn btn-primary" style="padding:12px 48px;font-size:16px" onclick="saveTrade()">💾 保存交易日志</button>
+      </div>
+    </div>
+
+    <div id="sub-trade-list" class="hidden">
+      <div class="card">
+        <div class="card-title"><span class="icon">📜</span> 历史交易记录</div>
+        <div id="tradeListBody">
+          <div class="empty"><div class="icon">📭</div>暂无交易记录</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 周复盘 ========== -->
+  <div id="page-weekly" class="page hidden">
+    <div class="card">
+      <div class="card-title"><span class="icon">📅</span> 周绩效统计</div>
+      <div class="form-row">
+        <div class="form-group"><label>周次</label><input type="text" id="wWeek" placeholder="如2025-W28"></div>
+        <div class="form-group"><label>开始日期</label><input type="date" id="wStart"></div>
+        <div class="form-group"><label>结束日期</label><input type="date" id="wEnd"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>总交易笔数</label><input type="number" id="wTrades"></div>
+        <div class="form-group"><label>盈利笔数</label><input type="number" id="wWins"></div>
+        <div class="form-group"><label>亏损笔数</label><input type="number" id="wLosses"></div>
+        <div class="form-group"><label>胜率(%)</label><input type="number" id="wWinRate" step="0.1"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>总盈亏(元)</label><input type="number" id="wPnl" step="0.01"></div>
+        <div class="form-group"><label>总R</label><input type="number" id="wTotalR" step="0.01"></div>
+        <div class="form-group"><label>平均盈利(R)</label><input type="number" id="wAvgWinR" step="0.01"></div>
+        <div class="form-group"><label>平均亏损(R)</label><input type="number" id="wAvgLossR" step="0.01"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>盈亏比</label><input type="number" id="wRR" step="0.1"></div>
+        <div class="form-group"><label>R期望值</label><input type="number" id="wExpectR" step="0.01"></div>
+        <div class="form-group"><label>最大连续亏损</label><input type="number" id="wMaxConsec"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🎯</span> 选股复盘</div>
+      <div class="form-row">
+        <div class="form-group"><label>关注列表总数</label><input type="number" id="wWatchCount"></div>
+        <div class="form-group"><label>触发入场数</label><input type="number" id="wTriggered"></div>
+        <div class="form-group"><label>实际大涨数</label><input type="number" id="wBigGain"></div>
+        <div class="form-group"><label>命中率(%)</label><input type="number" id="wHitRate" step="0.1"></div>
+      </div>
+      <div class="form-group"><label>漏掉的大涨股</label><input type="text" id="wMissed" placeholder="如：江波龙、中微公司"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🧠</span> 心态复盘</div>
+      <div class="form-group"><label>违规操作次数</label><input type="number" id="wViolations" placeholder="如0"></div>
+      <div class="form-group"><label>最冲动的时刻</label><textarea id="wImpulse" placeholder="描述本周最冲动的操作"></textarea></div>
+      <div class="form-group"><label>报复性交易</label>
+        <div class="check-group">
+          <label class="check-item"><input type="radio" name="wRevenge" value="有">有</label>
+          <label class="check-item"><input type="radio" name="wRevenge" value="无">无</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⭐</span> 经典案例 / 典型错误</div>
+      <div class="form-group"><label>本周最佳交易</label><input type="text" id="wBestTrade" placeholder="如：江波龙+3.5R"></div>
+      <div class="form-group"><label>原因</label><textarea id="wBestReason"></textarea></div>
+      <div class="form-group"><label>本周最差交易</label><input type="text" id="wWorstTrade" placeholder="如：佰维存储-1R"></div>
+      <div class="form-group"><label>原因</label><textarea id="wWorstReason"></textarea></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> 下周改进点（最多3条）</div>
+      <div class="form-group"><label>1.</label><input type="text" id="wImprove1"></div>
+      <div class="form-group"><label>2.</label><input type="text" id="wImprove2"></div>
+      <div class="form-group"><label>3.</label><input type="text" id="wImprove3"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px">
+      <button class="btn btn-primary" style="padding:12px 48px;font-size:16px" onclick="saveWeekly()">💾 保存周复盘</button>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-title"><span class="icon">📚</span> 历史周复盘</div>
+      <div id="weeklyListBody">
+        <div class="empty"><div class="icon">📭</div>暂无周复盘记录</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 月复盘 ========== -->
+  <div id="page-monthly" class="page hidden">
+    <div class="card">
+      <div class="card-title"><span class="icon">📆</span> 月度绩效</div>
+      <div class="form-row">
+        <div class="form-group"><label>月份</label><input type="text" id="mMonth" placeholder="如2025-07"></div>
+        <div class="form-group"><label>总交易笔数</label><input type="number" id="mTrades"></div>
+        <div class="form-group"><label>盈利笔数</label><input type="number" id="mWins"></div>
+        <div class="form-group"><label>胜率(%)</label><input type="number" id="mWinRate" step="0.1"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>平均盈利(R)</label><input type="number" id="mAvgWinR" step="0.01"></div>
+        <div class="form-group"><label>平均亏损(R)</label><input type="number" id="mAvgLossR" step="0.01"></div>
+        <div class="form-group"><label>盈亏比</label><input type="number" id="mRR" step="0.1"></div>
+        <div class="form-group"><label>R期望值</label><input type="number" id="mExpectR" step="0.01"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>月度总R</label><input type="number" id="mTotalR" step="0.01"></div>
+        <div class="form-group"><label>月度总盈亏(元)</label><input type="number" id="mPnl" step="0.01"></div>
+        <div class="form-group"><label>月度收益率(%)</label><input type="number" id="mReturn" step="0.1"></div>
+        <div class="form-group"><label>最大回撤(%)</label><input type="number" id="mMaxDD" step="0.1"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>最大连续亏损</label><input type="number" id="mMaxConsec"></div>
+        <div class="form-group"><label>平均持股天数</label><input type="number" id="mAvgHold" step="0.1"></div>
+        <div class="form-group"><label>平均仓位(%)</label><input type="number" id="mAvgPos" step="0.1"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔧</span> 系统健康度检查</div>
+      <div class="check-group" id="systemHealth">
+        <label class="check-item"><input type="checkbox" value="win40"> 胜率≥40%</label>
+        <label class="check-item"><input type="checkbox" value="rr2"> 盈亏比≥2:1</label>
+        <label class="check-item"><input type="checkbox" value="expect-pos"> R期望>0</label>
+        <label class="check-item"><input type="checkbox" value="dd-ok"> 最大回撤≤-6R</label>
+        <label class="check-item"><input type="checkbox" value="trades-ok"> 月交易15-25次</label>
+        <label class="check-item"><input type="checkbox" value="exec-ok"> 执行率≥85%</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🧠</span> 交易心理自评（1-10分）</div>
+      <div class="form-row">
+        <div class="form-group"><label>执行纪律</label><input type="number" id="mExec" min="1" max="10"></div>
+        <div class="form-group"><label>概率思维</label><input type="number" id="mProb" min="1" max="10"></div>
+        <div class="form-group"><label>情绪控制</label><input type="number" id="mEmotion" min="1" max="10"></div>
+        <div class="form-group"><label>耐心等待</label><input type="number" id="mPatience" min="1" max="10"></div>
+        <div class="form-group"><label>止损果断</label><input type="number" id="mStopLoss" min="1" max="10"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🌐</span> 板块与主线复盘</div>
+      <div class="form-group"><label>本月主线</label><input type="text" id="mMainline" placeholder="如：存储、半导体设备"></div>
+      <div class="form-group"><label>自己跟上主线</label>
+        <div class="check-group">
+          <label class="check-item"><input type="radio" name="mFollow" value="是">是</label>
+          <label class="check-item"><input type="radio" name="mFollow" value="部分">部分</label>
+          <label class="check-item"><input type="radio" name="mFollow" value="否">否</label>
+        </div>
+      </div>
+      <div class="form-group"><label>错过的主线机会</label><textarea id="mMissed"></textarea></div>
+      <div class="form-group"><label>下月关注方向</label><textarea id="mNextDirection"></textarea></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⭐</span> 最优/最差交易分析</div>
+      <div class="form-group"><label>本月最佳交易</label><input type="text" id="mBestTrade"></div>
+      <div class="form-group"><label>共性特征</label><textarea id="mBestCommon"></textarea></div>
+      <div class="form-group"><label>本月最差交易</label><input type="text" id="mWorstTrade"></div>
+      <div class="form-group"><label>共性特征</label><textarea id="mWorstCommon"></textarea></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📝</span> 月度总结（至少500字）</div>
+      <textarea id="mSummary" style="min-height:200px" placeholder="数据回顾、经验提炼、下月计划"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🎯</span> 下月计划</div>
+      <div class="form-group"><label>月度R目标</label><input type="number" id="mTargetR" step="0.1" placeholder="如4"></div>
+      <div class="form-group"><label>重点改进1</label><input type="text" id="mImprove1"></div>
+      <div class="form-group"><label>重点改进2</label><input type="text" id="mImprove2"></div>
+      <div class="form-group"><label>重点改进3</label><input type="text" id="mImprove3"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px">
+      <button class="btn btn-primary" style="padding:12px 48px;font-size:16px" onclick="saveMonthly()">💾 保存月复盘</button>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-title"><span class="icon">📚</span> 历史月复盘</div>
+      <div id="monthlyListBody">
+        <div class="empty"><div class="icon">📭</div>暂无月复盘记录</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 数据总览 ========== -->
+  <div id="page-stats" class="page hidden">
+    <div class="stat-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-value" id="statTrades">0</div><div class="stat-label">总交易笔数</div></div>
+      <div class="stat-card"><div class="stat-value" id="statWins">0</div><div class="stat-label">盈利笔数</div></div>
+      <div class="stat-card"><div class="stat-value" id="statWinRate">0%</div><div class="stat-label">胜率</div></div>
+      <div class="stat-card"><div class="stat-value" id="statTotalR">0R</div><div class="stat-label">总R</div></div>
+      <div class="stat-card green"><div class="stat-value" id="statAvgWinR">0R</div><div class="stat-label">平均盈利</div></div>
+      <div class="stat-card red"><div class="stat-value" id="statAvgLossR">0R</div><div class="stat-label">平均亏损</div></div>
+      <div class="stat-card"><div class="stat-value" id="statRR">0:1</div><div class="stat-label">盈亏比</div></div>
+      <div class="stat-card"><div class="stat-value" id="statExpectR">0R</div><div class="stat-label">R期望</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📅</span> 最近日复盘</div>
+      <div id="recentDailyBody">
+        <div class="empty"><div class="icon">📭</div>暂无记录</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Token Setting Modal -->
+<div id="tokenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:9998;justify-content:center;align-items:center">
+  <div style="background:#fff;border-radius:14px;padding:28px;max-width:420px;width:90%">
+    <h3 style="margin-bottom:12px">设置 GitHub Token</h3>
+    <p style="font-size:13px;color:var(--text-light);margin-bottom:16px">Token存在浏览器本地，不会上传。用于读写GitHub仓库数据。</p>
+    <input type="password" id="tokenInput" placeholder="github_pat_..." style="width:100%;margin-bottom:16px">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="document.getElementById('tokenModal').style.display='none'">取消</button>
+      <button class="btn btn-primary" onclick="saveTokenInput()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Token Button (floating) -->
+<button onclick="openTokenModal()" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;border:none;background:var(--primary);color:#fff;font-size:18px;cursor:pointer;box-shadow:var(--shadow-lg);z-index:100">🔑</button>
+
+<script>
+// ========== 配置 ==========
+const GITHUB_OWNER = "wuxuanyue9-crypto";
+const GITHUB_REPO = "trade-review";
+const DATA_BRANCH = "main";
+
+// Token从浏览器本地存储读取，不硬编码在代码里
+function getToken() { return localStorage.getItem("gh_token") || ""; }
+function setToken(t) { localStorage.setItem("gh_token", t); }
+
+function authHeaders() {
+  const token = getToken();
+  if (!token) {
+    showToast("请先设置GitHub Token（点击底部Token按钮）");
+    return null;
+  }
+  return { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github.v3+json" };
+}
+
+// ========== GitHub API ==========
+async function githubRead(path) {
+  const headers = authHeaders(); if (!headers) return null;
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${DATA_BRANCH}`;
+  const res = await fetch(url, { headers });
+  if (res.status === 404) return null;
+  const data = await res.json();
+  return JSON.parse(decodeURIComponent(escape(atob(data.content))));
+}
+
+async function githubWrite(path, content, sha) {
+  const headers = authHeaders(); if (!headers) return null;
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2))));
+  const body = { message: `update ${path}`, content: encoded, branch: DATA_BRANCH };
+  if (sha) body.sha = sha;
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function githubGetSha(path) {
+  const headers = authHeaders(); if (!headers) return null;
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${DATA_BRANCH}`;
+  const res = await fetch(url, { headers });
+  if (res.status === 404) return null;
+  const data = await res.json();
+  return data.sha;
+}
+
+async function githubListDir(path) {
+  const headers = authHeaders(); if (!headers) return [];
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${DATA_BRANCH}`;
+  const res = await fetch(url, { headers });
+  if (res.status === 404) return [];
+  const data = await res.json();
+  if (!Array.isArray(data)) return [];
+  return data;
+}
+
+// ========== Toast ==========
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+// ========== 日期 ==========
+function todayStr() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${dd}`;
+}
+
+function formatDate(d) {
+  const days = ["日", "一", "二", "三", "四", "五", "六"];
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 星期${days[d.getDay()]}`;
+}
+
+// ========== 导航 ==========
+document.querySelectorAll(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+    document.getElementById("page-" + btn.dataset.page).classList.remove("hidden");
+    if (btn.dataset.page === "trades") loadTradeList();
+    if (btn.dataset.page === "weekly") loadWeeklyList();
+    if (btn.dataset.page === "monthly") loadMonthlyList();
+    if (btn.dataset.page === "stats") loadStats();
+  });
+});
+
+// Sub tabs
+document.querySelectorAll(".sub-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".sub-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    document.querySelectorAll("[id^='sub-trade-']").forEach(d => d.classList.add("hidden"));
+    document.getElementById("sub-" + tab.dataset.sub).classList.remove("hidden");
+    if (tab.dataset.sub === "trade-list") loadTradeList();
+  });
+});
+
+// Checkbox styling
+document.querySelectorAll(".check-item input").forEach(input => {
+  const updateStyle = () => {
+    if (input.type === "checkbox" || input.type === "radio") {
+      if (input.checked) input.parentElement.classList.add("active");
+      else input.parentElement.classList.remove("active");
+    }
+  };
+  input.addEventListener("change", updateStyle);
+  updateStyle();
+});
+
+// ========== 动态添加 ==========
+let opCount = 1;
+function addDailyOp() {
+  const html = `
+    <div class="trade-entry">
+      <div class="trade-header">
+        <select style="width:auto" class="op-type">
+          <option value="">操作类型</option>
+          <option value="买入">买入</option>
+          <option value="卖出">卖出</option>
+          <option value="止损">止损</option>
+          <option value="止盈">止盈</option>
+        </select>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="this.parentElement.parentElement.remove()">删除</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>代码</label><input type="text" class="op-code"></div>
+        <div class="form-group"><label>名称</label><input type="text" class="op-name"></div>
+        <div class="form-group"><label>价格</label><input type="number" class="op-price" step="0.01"></div>
+        <div class="form-group"><label>数量</label><input type="number" class="op-shares"></div>
+      </div>
+      <div class="form-group"><label>理由</label><input type="text" class="op-reason"></div>
+    </div>`;
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  document.getElementById("dailyOpsContainer").appendChild(div.firstElementChild);
+}
+
+let wlCount = 1;
+function addWatchlist() {
+  const html = `
+    <div class="trade-entry">
+      <div class="form-row">
+        <div class="form-group"><label>代码</label><input type="text" class="wl-code"></div>
+        <div class="form-group"><label>名称</label><input type="text" class="wl-name"></div>
+        <div class="form-group"><label>触发价</label><input type="number" class="wl-trigger" step="0.01"></div>
+        <div class="form-group"><label>止损价</label><input type="number" class="wl-stop" step="0.01"></div>
+        <div class="form-group"><label>目标价</label><input type="number" class="wl-target" step="0.01"></div>
+      </div>
+      <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="this.parentElement.remove()">删除</button>
+    </div>`;
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  document.getElementById("watchlistContainer").appendChild(div.firstElementChild);
+}
+
+// ========== AI推荐 ==========
+function generateAIRecommend() {
+  const idxClose = parseFloat(document.getElementById("dailyIdxClose").value);
+  const idxMA20 = parseFloat(document.getElementById("dailyIdxMA20").value);
+  const limitUp = parseInt(document.getElementById("dailyLimitUp").value) || 0;
+  const limitDown = parseInt(document.getElementById("dailyLimitDown").value) || 0;
+  const turnover = parseFloat(document.getElementById("dailyTurnover").value) || 0;
+  const strongSectors = document.getElementById("dailyStrongSectors").value;
+
+  // 大盘判断
+  let marketStatus = "";
+  let marketAdvice = "";
+  if (!isNaN(idxClose) && !isNaN(idxMA20)) {
+    if (idxClose > idxMA20) {
+      marketStatus = "OK（深证综指在20日线上方）";
+      marketAdvice = "大盘处于可交易状态，按系统规则正常选股入场。";
+    } else {
+      marketStatus = "CAUTION（深证综指在20日线下方）";
+      marketAdvice = "大盘偏弱，控制仓位，只低吸不追高，止损要果断。";
+    }
+  } else {
+    marketStatus = "数据不足";
+    marketAdvice = "请填写深证综指收盘价和20日线位置。";
+  }
+
+  // 情绪判断
+  let emotionAdvice = "";
+  const upDownRatio = limitDown > 0 ? limitUp / limitDown : limitUp;
+  if (limitUp > 30 && limitDown < 10) {
+    emotionAdvice = "市场情绪偏暖，涨停" + limitUp + "家、跌停" + limitDown + "家，赚钱效应好。";
+  } else if (limitUp < 15 || limitDown > 20) {
+    emotionAdvice = "市场情绪偏冷，涨停" + limitUp + "家、跌停" + limitDown + "家，谨慎为主。";
+  } else {
+    emotionAdvice = "市场情绪中性，涨停" + limitUp + "家、跌停" + limitDown + "家。";
+  }
+
+  // 成交额判断
+  let turnoverAdvice = "";
+  if (turnover > 15000) {
+    turnoverAdvice = "成交额" + turnover + "亿，放量明显，资金活跃。";
+  } else if (turnover > 8000) {
+    turnoverAdvice = "成交额" + turnover + "亿，正常水平。";
+  } else {
+    turnoverAdvice = "成交额" + turnover + "亿，缩量明显，观望为主。";
+  }
+
+  // 板块判断
+  let sectorAdvice = "";
+  if (strongSectors) {
+    const sectors = strongSectors.split(/[,，、\s]+/).filter(s => s);
+    sectorAdvice = `今日强势板块：${sectors.join("、")}。<br>老冯原则："盯着主线，1-2条主线，3-4个板块。" 建议从强势板块中选回调企稳的个股，不在弱势板块中找机会。`;
+  }
+
+  // 综合建议
+  let overallAdvice = "";
+  if (marketStatus.startsWith("OK")) {
+    overallAdvice = `市场可交易。按老冯方法：成交榜前200名过一遍，从自选股中找回调企稳+60分钟HH的标的，仓位1成，止损7%。`;
+  } else if (marketStatus.startsWith("CAUTION")) {
+    overallAdvice = `市场偏弱。仓位减半，只做最确定的信号，到止损价无条件执行。"账户优先＞逻辑优先＞板块优先＞个股优先。"`;
+  }
+
+  // 关注方向提示
+  const focusStocks = `
+    <strong>长期逻辑股票池（四个方向）：</strong>
+    <ul>
+      <li>存储：江波龙(301308)、佰维存储(688047)、德明利(001309)</li>
+      <li>半导体材料：鼎龙股份(300054)、沪硅产业(688126)</li>
+      <li>半导体设备：中微公司(688012)、拓荆科技(688072)、长川科技(300607)</li>
+      <li>医药：百济神州(688235)、荣昌生物(688331)、康龙化成(300759)</li>
+    </ul>
+  `;
+
+  document.getElementById("aiRecommend").innerHTML = `
+    <div class="ai-section">
+      <div class="ai-label">大盘判断</div>
+      <div class="ai-content">${marketStatus} ${marketAdvice}</div>
+    </div>
+    <div class="ai-section">
+      <div class="ai-label">市场情绪</div>
+      <div class="ai-content">${emotionAdvice} ${turnoverAdvice}</div>
+    </div>
+    <div class="ai-section">
+      <div class="ai-label">板块方向</div>
+      <div class="ai-content">${sectorAdvice || "请填写强势板块数据"}</div>
+    </div>
+    <div class="ai-section">
+      <div class="ai-label">综合建议</div>
+      <div class="ai-content">${overallAdvice}</div>
+    </div>
+    <div class="ai-section">
+      <div class="ai-label">关注股票池</div>
+      <div class="ai-content">${focusStocks}</div>
+    </div>
+  `;
+}
+
+// ========== 保存日复盘 ==========
+async function saveDaily() {
+  const date = document.getElementById("dailyDate").value;
+  if (!date) { showToast("请填写日期"); return; }
+
+  // 收集操作
+  const ops = [];
+  document.querySelectorAll("#dailyOpsContainer .trade-entry").forEach(entry => {
+    const type = entry.querySelector(".op-type").value;
+    if (type) {
+      ops.push({
+        type, code: entry.querySelector(".op-code").value,
+        name: entry.querySelector(".op-name").value,
+        price: parseFloat(entry.querySelector(".op-price").value) || 0,
+        shares: parseInt(entry.querySelector(".op-shares").value) || 0,
+        reason: entry.querySelector(".op-reason").value
+      });
+    }
+  });
+
+  // 收集关注列表
+  const watchlist = [];
+  document.querySelectorAll("#watchlistContainer .trade-entry").forEach(entry => {
+    const code = entry.querySelector(".wl-code").value;
+    if (code) {
+      watchlist.push({
+        code, name: entry.querySelector(".wl-name").value,
+        trigger: parseFloat(entry.querySelector(".wl-trigger").value) || 0,
+        stop: parseFloat(entry.querySelector(".wl-stop").value) || 0,
+        target: parseFloat(entry.querySelector(".wl-target").value) || 0,
+      });
+    }
+  });
+
+  // 执行检查
+  const execChecks = [];
+  document.querySelectorAll("#dailyExecChecks input:checked").forEach(c => execChecks.push(c.value));
+
+  // 情绪
+  let emotion = "";
+  document.querySelectorAll("#dailyEmotion input:checked").forEach(c => emotion = c.value);
+
+  const data = {
+    date,
+    market: document.getElementById("dailyMarket").value,
+    idxClose: parseFloat(document.getElementById("dailyIdxClose").value) || 0,
+    idxMA20: parseFloat(document.getElementById("dailyIdxMA20").value) || 0,
+    limitUp: parseInt(document.getElementById("dailyLimitUp").value) || 0,
+    limitDown: parseInt(document.getElementById("dailyLimitDown").value) || 0,
+    turnover: parseFloat(document.getElementById("dailyTurnover").value) || 0,
+    strongSectors: document.getElementById("dailyStrongSectors").value,
+    emotion,
+    ops,
+    positions: {
+      count: parseInt(document.getElementById("posCount").value) || 0,
+      totalPct: parseFloat(document.getElementById("posTotalPct").value) || 0,
+      pnl: parseFloat(document.getElementById("posPnl").value) || 0,
+      pnlR: parseFloat(document.getElementById("posPnlR").value) || 0,
+    },
+    watchlist,
+    note: document.getElementById("dailyNote").value,
+    execChecks,
+    aiRecommend: document.getElementById("aiRecommend").innerHTML,
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    showToast("保存中...");
+    const path = `data/daily/${date}.json`;
+    const sha = await githubGetSha(path);
+    await githubWrite(path, data, sha);
+    showToast("✅ 日复盘已保存");
+  } catch(e) {
+    showToast("❌ 保存失败: " + e.message);
+  }
+}
+
+// ========== 保存交易日志 ==========
+async function saveTrade() {
+  const code = document.getElementById("tCode").value;
+  if (!code) { showToast("请填写股票代码"); return; }
+
+  const entryReasons = [];
+  document.querySelectorAll("#entryReasons input:checked").forEach(c => entryReasons.push(c.value));
+
+  const data = {
+    code,
+    name: document.getElementById("tName").value,
+    sector: document.getElementById("tSector").value,
+    entryDate: document.getElementById("tEntryDate").value,
+    exitDate: document.getElementById("tExitDate").value,
+    holdDays: parseInt(document.getElementById("tHoldDays").value) || 0,
+    entryPrice: parseFloat(document.getElementById("tEntryPrice").value) || 0,
+    shares: parseInt(document.getElementById("tShares").value) || 0,
+    positionPct: parseFloat(document.getElementById("tPositionPct").value) || 0,
+    rAmount: parseFloat(document.getElementById("tRAmount").value) || 0,
+    stopLoss: parseFloat(document.getElementById("tStopLoss").value) || 0,
+    stopPct: parseFloat(document.getElementById("tStopPct").value) || 0,
+    target: parseFloat(document.getElementById("tTarget").value) || 0,
+    rr: parseFloat(document.getElementById("tRR").value) || 0,
+    entryReasons,
+    signalBar: document.getElementById("tSignalBar").value,
+    entryBar: document.getElementById("tEntryBar").value,
+    min60: document.getElementById("t60min").value,
+    exitPrice: parseFloat(document.getElementById("tExitPrice").value) || 0,
+    pnl: parseFloat(document.getElementById("tPnl").value) || 0,
+    pnlR: parseFloat(document.getElementById("tPnlR").value) || 0,
+    exitReason: document.getElementById("tExitReason").value,
+    accuracy: document.getElementById("tAccuracy").value,
+    highlight: document.getElementById("tHighlight").value,
+    improve: document.getElementById("tImprove").value,
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    showToast("保存中...");
+    const ts = Date.now();
+    const path = `data/trades/${ts}.json`;
+    await githubWrite(path, data);
+    showToast("✅ 交易日志已保存");
+    // 清空表单
+    document.querySelectorAll("#sub-trade-new input, #sub-trade-new textarea, #sub-trade-new select").forEach(el => {
+      if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+      else el.value = "";
+      if (el.parentElement.classList.contains("check-item")) el.parentElement.classList.remove("active");
+    });
+  } catch(e) {
+    showToast("❌ 保存失败: " + e.message);
+  }
+}
+
+// ========== 加载交易列表 ==========
+async function loadTradeList() {
+  try {
+    const files = await githubListDir("data/trades");
+    if (files.length === 0) {
+      document.getElementById("tradeListBody").innerHTML = '<div class="empty"><div class="icon">📭</div>暂无交易记录</div>';
+      return;
+    }
+    // 按时间倒序
+    files.sort((a, b) => b.name.localeCompare(a.name));
+    
+    let html = '<table><thead><tr><th>日期</th><th>代码</th><th>名称</th><th>方向</th><th>盈亏R</th><th>出场</th></tr></thead><tbody>';
+    for (const f of files.slice(0, 50)) {
+      try {
+        const trade = await githubRead(`data/trades/${f.name}`);
+        const pnlR = trade.pnlR || 0;
+        const color = pnlR > 0 ? "tag-green" : pnlR < 0 ? "tag-red" : "tag-yellow";
+        html += `<tr>
+          <td>${trade.entryDate || ""}</td>
+          <td>${trade.code || ""}</td>
+          <td>${trade.name || ""}</td>
+          <td>${trade.sector || ""}</td>
+          <td><span class="tag ${color}">${pnlR > 0 ? "+" : ""}${pnlR}R</span></td>
+          <td>${trade.exitReason || ""}</td>
+        </tr>`;
+      } catch(e) {}
+    }
+    html += "</tbody></table>";
+    document.getElementById("tradeListBody").innerHTML = html;
+  } catch(e) {
+    document.getElementById("tradeListBody").innerHTML = '<div class="empty">加载失败</div>';
+  }
+}
+
+// ========== 保存周复盘 ==========
+async function saveWeekly() {
+  const week = document.getElementById("wWeek").value;
+  if (!week) { showToast("请填写周次"); return; }
+
+  let revenge = "";
+  document.querySelectorAll("input[name='wRevenge']:checked").forEach(c => revenge = c.value);
+
+  const data = {
+    week, start: document.getElementById("wStart").value, end: document.getElementById("wEnd").value,
+    trades: parseInt(document.getElementById("wTrades").value) || 0,
+    wins: parseInt(document.getElementById("wWins").value) || 0,
+    losses: parseInt(document.getElementById("wLosses").value) || 0,
+    winRate: parseFloat(document.getElementById("wWinRate").value) || 0,
+    pnl: parseFloat(document.getElementById("wPnl").value) || 0,
+    totalR: parseFloat(document.getElementById("wTotalR").value) || 0,
+    avgWinR: parseFloat(document.getElementById("wAvgWinR").value) || 0,
+    avgLossR: parseFloat(document.getElementById("wAvgLossR").value) || 0,
+    rr: parseFloat(document.getElementById("wRR").value) || 0,
+    expectR: parseFloat(document.getElementById("wExpectR").value) || 0,
+    maxConsec: parseInt(document.getElementById("wMaxConsec").value) || 0,
+    watchCount: parseInt(document.getElementById("wWatchCount").value) || 0,
+    triggered: parseInt(document.getElementById("wTriggered").value) || 0,
+    bigGain: parseInt(document.getElementById("wBigGain").value) || 0,
+    hitRate: parseFloat(document.getElementById("wHitRate").value) || 0,
+    missed: document.getElementById("wMissed").value,
+    violations: parseInt(document.getElementById("wViolations").value) || 0,
+    impulse: document.getElementById("wImpulse").value,
+    revenge,
+    bestTrade: document.getElementById("wBestTrade").value,
+    bestReason: document.getElementById("wBestReason").value,
+    worstTrade: document.getElementById("wWorstTrade").value,
+    worstReason: document.getElementById("wWorstReason").value,
+    improve1: document.getElementById("wImprove1").value,
+    improve2: document.getElementById("wImprove2").value,
+    improve3: document.getElementById("wImprove3").value,
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    showToast("保存中...");
+    const path = `data/weekly/${week}.json`;
+    const sha = await githubGetSha(path);
+    await githubWrite(path, data, sha);
+    showToast("✅ 周复盘已保存");
+    loadWeeklyList();
+  } catch(e) {
+    showToast("❌ 保存失败: " + e.message);
+  }
+}
+
+// ========== 加载周复盘列表 ==========
+async function loadWeeklyList() {
+  try {
+    const files = await githubListDir("data/weekly");
+    if (files.length === 0) {
+      document.getElementById("weeklyListBody").innerHTML = '<div class="empty"><div class="icon">📭</div>暂无周复盘记录</div>';
+      return;
+    }
+    files.sort((a, b) => b.name.localeCompare(a.name));
+    let html = "";
+    for (const f of files.slice(0, 20)) {
+      try {
+        const w = await githubRead(`data/weekly/${f.name}`);
+        const rColor = w.totalR > 0 ? "tag-green" : "tag-red";
+        html += `<div class="trade-entry">
+          <div class="trade-header">
+            <span class="trade-name">${w.week || f.name}</span>
+            <span class="tag ${rColor}">${w.totalR > 0 ? "+" : ""}${w.totalR || 0}R</span>
+          </div>
+          <div class="trade-meta">
+            胜率${w.winRate || 0}% · 盈亏比${w.rr || 0}:1 · R期望${w.expectR || 0}R · ${w.trades || 0}笔
+          </div>
+          ${w.improve1 ? `<div class="trade-meta">改进：${w.improve1}</div>` : ""}
+        </div>`;
+      } catch(e) {}
+    }
+    document.getElementById("weeklyListBody").innerHTML = html || '<div class="empty">加载失败</div>';
+  } catch(e) {
+    document.getElementById("weeklyListBody").innerHTML = '<div class="empty">加载失败</div>';
+  }
+}
+
+// ========== 保存月复盘 ==========
+async function saveMonthly() {
+  const month = document.getElementById("mMonth").value;
+  if (!month) { showToast("请填写月份"); return; }
+
+  let follow = "";
+  document.querySelectorAll("input[name='mFollow']:checked").forEach(c => follow = c.value);
+
+  const systemHealth = [];
+  document.querySelectorAll("#systemHealth input:checked").forEach(c => systemHealth.push(c.value));
+
+  const data = {
+    month,
+    trades: parseInt(document.getElementById("mTrades").value) || 0,
+    wins: parseInt(document.getElementById("mWins").value) || 0,
+    winRate: parseFloat(document.getElementById("mWinRate").value) || 0,
+    avgWinR: parseFloat(document.getElementById("mAvgWinR").value) || 0,
+    avgLossR: parseFloat(document.getElementById("mAvgLossR").value) || 0,
+    rr: parseFloat(document.getElementById("mRR").value) || 0,
+    expectR: parseFloat(document.getElementById("mExpectR").value) || 0,
+    totalR: parseFloat(document.getElementById("mTotalR").value) || 0,
+    pnl: parseFloat(document.getElementById("mPnl").value) || 0,
+    return: parseFloat(document.getElementById("mReturn").value) || 0,
+    maxDD: parseFloat(document.getElementById("mMaxDD").value) || 0,
+    maxConsec: parseInt(document.getElementById("mMaxConsec").value) || 0,
+    avgHold: parseFloat(document.getElementById("mAvgHold").value) || 0,
+    avgPos: parseFloat(document.getElementById("mAvgPos").value) || 0,
+    systemHealth,
+    execScore: parseInt(document.getElementById("mExec").value) || 0,
+    probScore: parseInt(document.getElementById("mProb").value) || 0,
+    emotionScore: parseInt(document.getElementById("mEmotion").value) || 0,
+    patienceScore: parseInt(document.getElementById("mPatience").value) || 0,
+    stopLossScore: parseInt(document.getElementById("mStopLoss").value) || 0,
+    mainline: document.getElementById("mMainline").value,
+    follow,
+    missed: document.getElementById("mMissed").value,
+    nextDirection: document.getElementById("mNextDirection").value,
+    bestTrade: document.getElementById("mBestTrade").value,
+    bestCommon: document.getElementById("mBestCommon").value,
+    worstTrade: document.getElementById("mWorstTrade").value,
+    worstCommon: document.getElementById("mWorstCommon").value,
+    summary: document.getElementById("mSummary").value,
+    targetR: parseFloat(document.getElementById("mTargetR").value) || 0,
+    improve1: document.getElementById("mImprove1").value,
+    improve2: document.getElementById("mImprove2").value,
+    improve3: document.getElementById("mImprove3").value,
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    showToast("保存中...");
+    const path = `data/monthly/${month}.json`;
+    const sha = await githubGetSha(path);
+    await githubWrite(path, data, sha);
+    showToast("✅ 月复盘已保存");
+    loadMonthlyList();
+  } catch(e) {
+    showToast("❌ 保存失败: " + e.message);
+  }
+}
+
+// ========== 加载月复盘列表 ==========
+async function loadMonthlyList() {
+  try {
+    const files = await githubListDir("data/monthly");
+    if (files.length === 0) {
+      document.getElementById("monthlyListBody").innerHTML = '<div class="empty"><div class="icon">📭</div>暂无月复盘记录</div>';
+      return;
+    }
+    files.sort((a, b) => b.name.localeCompare(a.name));
+    let html = "";
+    for (const f of files.slice(0, 20)) {
+      try {
+        const m = await githubRead(`data/monthly/${f.name}`);
+        const rColor = m.totalR > 0 ? "tag-green" : "tag-red";
+        const avgScore = ((m.execScore + m.probScore + m.emotionScore + m.patienceScore + m.stopLossScore) / 5).toFixed(1);
+        html += `<div class="trade-entry">
+          <div class="trade-header">
+            <span class="trade-name">${m.month || f.name}</span>
+            <span class="tag ${rColor}">${m.totalR > 0 ? "+" : ""}${m.totalR || 0}R</span>
+          </div>
+          <div class="trade-meta">
+            胜率${m.winRate || 0}% · 盈亏比${m.rr || 0}:1 · 收益率${m["return"] || 0}% · 心理评分${avgScore}
+          </div>
+          ${m.summary ? `<div class="trade-meta" style="margin-top:8px">${(m.summary || "").substring(0, 100)}...</div>` : ""}
+        </div>`;
+      } catch(e) {}
+    }
+    document.getElementById("monthlyListBody").innerHTML = html || '<div class="empty">加载失败</div>';
+  } catch(e) {
+    document.getElementById("monthlyListBody").innerHTML = '<div class="empty">加载失败</div>';
+  }
+}
+
+// ========== 数据总览 ==========
+async function loadStats() {
+  try {
+    const files = await githubListDir("data/trades");
+    let allTrades = [];
+    for (const f of files) {
+      try {
+        const t = await githubRead(`data/trades/${f.name}`);
+        allTrades.push(t);
+      } catch(e) {}
+    }
+
+    const total = allTrades.length;
+    const wins = allTrades.filter(t => t.pnlR > 0);
+    const losses = allTrades.filter(t => t.pnlR <= 0);
+    const winRate = total > 0 ? (wins.length / total * 100).toFixed(1) : 0;
+    const totalR = allTrades.reduce((s, t) => s + (t.pnlR || 0), 0).toFixed(2);
+    const avgWinR = wins.length > 0 ? (wins.reduce((s, t) => s + (t.pnlR || 0), 0) / wins.length).toFixed(2) : 0;
+    const avgLossR = losses.length > 0 ? (losses.reduce((s, t) => s + (t.pnlR || 0), 0) / losses.length).toFixed(2) : 0;
+    const rr = avgLossR != 0 ? Math.abs(avgWinR / avgLossR).toFixed(2) : 0;
+    const expectR = total > 0 ? ((wins.length / total) * avgWinR + (losses.length / total) * avgLossR).toFixed(2) : 0;
+
+    document.getElementById("statTrades").textContent = total;
+    document.getElementById("statWins").textContent = wins.length;
+    document.getElementById("statWinRate").textContent = winRate + "%";
+    document.getElementById("statTotalR").textContent = totalR + "R";
+    document.getElementById("statAvgWinR").textContent = avgWinR + "R";
+    document.getElementById("statAvgLossR").textContent = avgLossR + "R";
+    document.getElementById("statRR").textContent = rr + ":1";
+    document.getElementById("statExpectR").textContent = expectR + "R";
+
+    // 最近日复盘
+    const dailyFiles = await githubListDir("data/daily");
+    if (dailyFiles.length > 0) {
+      dailyFiles.sort((a, b) => b.name.localeCompare(a.name));
+      let html = "";
+      for (const f of dailyFiles.slice(0, 5)) {
+        try {
+          const d = await githubRead(`data/daily/${f.name}`);
+          const mTag = d.market === "OK" ? '<span class="tag tag-green">OK</span>' :
+                       d.market === "CAUTION" ? '<span class="tag tag-yellow">CAUTION</span>' :
+                       '<span class="tag tag-red">CRASH</span>';
+          html += `<div class="trade-entry">
+            <div class="trade-header">
+              <span class="trade-name">${d.date}</span>
+              ${mTag}
+            </div>
+            <div class="trade-meta">
+              涨停${d.limitUp || 0}家 · 跌停${d.limitDown || 0}家 · 成交${d.turnover || 0}亿
+            </div>
+            <div class="trade-meta">强势板块：${d.strongSectors || "—"}</div>
+            ${d.note ? `<div class="trade-meta">心得：${d.note}</div>` : ""}
+          </div>`;
+        } catch(e) {}
+      }
+      document.getElementById("recentDailyBody").innerHTML = html || '<div class="empty">无记录</div>';
+    }
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+// ========== Token Modal ==========
+function openTokenModal() {
+  document.getElementById('tokenInput').value = getToken();
+  document.getElementById('tokenModal').style.display = 'flex';
+}
+function saveTokenInput() {
+  const val = document.getElementById('tokenInput').value.trim();
+  if (val) {
+    setToken(val);
+    document.getElementById('tokenModal').style.display = 'none';
+    showToast('✅ Token已保存');
+  }
+}
+
+// ========== 初始化 ==========
+document.getElementById("todayDate").textContent = formatDate(new Date());
+document.getElementById("dailyDate").value = todayStr();
+document.getElementById("tEntryDate").value = todayStr();
+</script>
+</body>
+</html>
