@@ -1072,22 +1072,21 @@ function generateAIRecommend() {
     </ul>
   `;
 
-  // 主线板块分析（异步获取）
-  fetchMainLineSectors().then(sectors => {
-    let mainLineHTML = "";
-    if (sectors && sectors.length > 0) {
-      mainLineHTML = `<div style=\"margin-top:8px\">成交额×换手率前1%个股集中的板块（倒序）：<br><ul>`;
-      for (const s of sectors.slice(0, 8)) {
-        const topStocks = s.stocks.slice(0, 3).map(st => `${st.name}(${st.code})`).join("、");
-        mainLineHTML += `<li><strong>${s.name}</strong> — ${s.count}只，总分${s.totalScore.toFixed(0)}，代表：${topStocks}</li>`;
-      }
-      mainLineHTML += `</ul>老冯原则："盯着主线，1-2条主线，3-4个板块，50个自选股。"</div>`;
-    } else {
-      mainLineHTML = `（点击“自动获取”后自动计算）`;
+
+  // 主线板块分析 - 同步渲染，数据已在window._mainLineSectors
+  let mainLineHTML = "";
+  const sectors = window._mainLineSectors;
+  if (sectors && sectors.length > 0) {
+    mainLineHTML = `<div style="margin-top:8px">成交额×换手率前1%个股集中的板块（倒序）：<br><ul>`;
+    for (const s of sectors.slice(0, 8)) {
+      const stocks = s.topStocks || s.stocks || [];
+      const topStocks = stocks.slice(0, 3).map(st => `${st.name}(${st.code})`).join("、");
+      mainLineHTML += `<li><strong>${s.name}</strong> — ${s.count}只，总分${Math.round(s.totalScore)}，代表：${topStocks}</li>`;
     }
-    const mainLineDiv = document.getElementById("mainLineAnalysis");
-    if (mainLineDiv) mainLineDiv.innerHTML = mainLineHTML;
-  });
+    mainLineHTML += `</ul>老冯原则："盯着主线，1-2条主线，3-4个板块，50个自选股。"</div>`;
+  } else {
+    mainLineHTML = `（点击"自动获取"后自动加载）`;
+  }
 
   document.getElementById("aiRecommend").innerHTML = `
     <div class="ai-section">
@@ -1104,7 +1103,7 @@ function generateAIRecommend() {
     </div>
     <div class="ai-section">
       <div class="ai-label">主线板块分析（成交额×换手率前1%集中度）</div>
-      <div class="ai-content" id="mainLineAnalysis">正在计算...</div>
+      <div class="ai-content">${mainLineHTML}</div>
     </div>
     <div class="ai-section">
       <div class="ai-label">综合建议</div>
@@ -1115,24 +1114,7 @@ function generateAIRecommend() {
       <div class="ai-content">${focusStocks}</div>
     </div>
   `;
-  // 重新触发主线板块分析
-  fetchMainLineSectors().then(sectors => {
-    let mainLineHTML = "";
-    if (sectors && sectors.length > 0) {
-      mainLineHTML = `<div style="margin-top:8px">成交额×换手率前1%个股集中的板块（倒序）：<br><ul>`;
-      for (const s of sectors.slice(0, 8)) {
-        const topStocks = s.stocks.slice(0, 3).map(st => `${st.name}(${st.code})`).join("、");
-        mainLineHTML += `<li><strong>${s.name}</strong> — ${s.count}只，总分${s.totalScore.toFixed(0)}，代表：${topStocks}</li>`;
-      }
-      mainLineHTML += `</ul>老冯原则："盯着主线，1-2条主线，3-4个板块，50个自选股。"</div>`;
-    } else {
-      mainLineHTML = `获取失败或非交易日`;
-    }
-    const mainLineDiv = document.getElementById("mainLineAnalysis");
-    if (mainLineDiv) mainLineDiv.innerHTML = mainLineHTML;
-  });
 }
-
 // ========== 保存日复盘 ==========
 async function saveDaily() {
   const date = document.getElementById("dailyDate").value;
