@@ -962,7 +962,7 @@ async function fetchMarketData() {
 
   try {
     // 读取latest.json（和网页同仓库，同源请求，不需要代理）
-    const res = await fetch("https://raw.githubusercontent.com/wuxuanyue9-crypto/trade-review/main/data/market/latest.json");
+    const res = await fetch("https://raw.githubusercontent.com/wuxuanyue9-crypto/trade-review/main/data/market/latest.json?v=" + Date.now());
     if (!res.ok) throw new Error("未找到市场数据文件");
     const data = await res.json();
 
