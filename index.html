@@ -953,151 +953,41 @@ function addWatchlist() {
 
 // ========== Tushare API ==========
 const TUSHARE_TOKEN = "5f0c7ce44620fa7e732c0fcc80a0ff965a1bc835d499d0263b4a6b1f";
-// Tushare没有CORS，通过corsproxy.io代理
-const CORS_PROXY = "https://corsproxy.io/?url=";
 
-async function tushare(apiName, params, fields) {
-  const body = JSON.stringify({
-    api_name: apiName,
-    token: TUSHARE_TOKEN,
-    params: params || {},
-    fields: fields || ""
-  });
-  const res = await fetch(CORS_PROXY + encodeURIComponent("https://api.tushare.pro"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: body
-  });
-  const data = await res.json();
-  if (data.code !== 0) throw new Error(data.msg || "Tushare API error");
-  return data.data;
-}
-
-// Tushare返回的data格式: {fields: [...], items: [[...], ...]}
-// 转为对象数组
-function tushareRows(data) {
-  if (!data || !data.items) return [];
-  return data.items.map(item => {
-    const obj = {};
-    data.fields.forEach((f, i) => obj[f] = item[i]);
-    return obj;
-  });
-}
-
-// ========== 自动获取市场数据 ==========
+// 从GitHub仓库读取市场数据JSON（不需要CORS代理，GitHub Pages同源）
 async function fetchMarketData() {
   const status = document.getElementById("fetchStatus");
   status.style.display = "block";
-  status.textContent = "⏳ 正在获取市场数据...";
+  status.textContent = "⏳ 正在读取市场数据...";
 
   try {
-    // 获取今天日期（Tushare格式：YYYYMMDD）
-    const today = todayStr().replace(/-/g, "");
-
-    // 1. 深证综指（399106.SZ）日线
-    status.textContent = "⏳ 获取指数数据...";
-    const idxData = await tushare("index_daily", { ts_code: "399106.SZ" }, "trade_date,close,pct_chg");
-    const idxRows = tushareRows(idxData);
-    if (idxRows.length === 0) throw new Error("无指数数据");
-    idxRows.sort((a, b) => b.trade_date.localeCompare(a.trade_date));
-    const latestIdx = idxRows[0];
-    const idxClose = latestIdx.close;
-    const idxPct = latestIdx.pct_chg;
-    // MA20
-    const last20 = idxRows.slice(0, 20);
-    const ma20 = last20.length >= 20 ? last20.reduce((s, r) => s + r.close, 0) / 20 : 0;
-
-    // 2. 全市场日线 - 成交额和涨跌幅
-    status.textContent = "⏳ 获取全市场行情...";
-    const tradeDate = latestIdx.trade_date; // 用最新交易日
-    const dailyData = await tushare("daily", { trade_date: tradeDate }, "ts_code,close,pct_chg,amount");
-    const dailyRows = tushareRows(dailyData);
-
-    // 3. 全市场基本面 - 换手率
-    status.textContent = "⏳ 获取换手率数据...";
-    const basicData = await tushare("daily_basic", { trade_date: tradeDate }, "ts_code,turnover_rate");
-    const basicRows = tushareRows(basicData);
-    const turnoverMap = {};
-    basicRows.forEach(r => turnoverMap[r.ts_code] = r.turnover_rate);
-
-    // 4. 股票基础信息 - 行业分类
-    status.textContent = "⏳ 获取行业分类...";
-    const stockData = await tushare("stock_basic", {}, "ts_code,name,industry");
-    const stockRows = tushareRows(stockData);
-    const stockMap = {};
-    stockRows.forEach(r => stockMap[r.ts_code] = r);
-
-    // 5. 计算两市总成交额
-    const totalTurnover = Math.round(dailyRows.reduce((s, r) => s + (r.amount || 0), 0) / 1e3) / 10; // 转为亿
-
-    // 6. 涨停跌停家数（pct_chg >= 9.8 算涨停，<= -9.8 算跌停）
-    // 20cm股票涨跌幅更大，统一用>=9.8和<=-9.8
-    let limitUp = 0, limitDown = 0;
-    for (const r of dailyRows) {
-      if (r.pct_chg >= 9.8) limitUp++;
-      else if (r.pct_chg <= -9.8) limitDown++;
-    }
-
-    // 7. 主线板块分析：成交额*换手率前1%
-    status.textContent = "⏳ 计算主线板块...";
-    const enriched = [];
-    for (const r of dailyRows) {
-      const tr = turnoverMap[r.ts_code] || 0;
-      const stock = stockMap[r.ts_code];
-      if (!stock || !tr || !r.amount) continue;
-      enriched.push({
-        code: r.ts_code, name: stock.name || r.ts_code,
-        amount: r.amount / 1e3, // 千元转为亿元
-        turnover: tr,
-        score: (r.amount / 1e3) * tr,
-        industry: stock.industry || "未分类"
-      });
-    }
-    enriched.sort((a, b) => b.score - a.score);
-    const top1pct = enriched.slice(0, Math.max(10, Math.ceil(enriched.length * 0.01)));
-
-    // 按行业聚合
-    const sectorMap = {};
-    for (const s of top1pct) {
-      if (!sectorMap[s.industry]) sectorMap[s.industry] = { count: 0, totalScore: 0, stocks: [] };
-      sectorMap[s.industry].count++;
-      sectorMap[s.industry].totalScore += s.score;
-      sectorMap[s.industry].stocks.push(s);
-    }
-    const mainLineSectors = Object.entries(sectorMap).map(([name, d]) => ({
-      name, count: d.count, totalScore: d.totalScore,
-      stocks: d.stocks.sort((a, b) => b.score - a.score)
-    })).sort((a, b) => b.totalScore - a.totalScore);
-
-    // 8. 强势板块 - 从主线分析取前5
-    const strongSectors = mainLineSectors.slice(0, 5).map(s => s.name).join(", ");
-
-    // 9. 判断大盘状态
-    let marketStatus = "OK";
-    if (idxPct < -2 || (ma20 > 0 && idxClose < ma20)) marketStatus = "CAUTION";
-    if (idxPct < -3) marketStatus = "CRASH";
+    // 读取latest.json（和网页同仓库，同源请求，不需要代理）
+    const res = await fetch("https://raw.githubusercontent.com/wuxuanyue9-crypto/trade-review/main/data/market/latest.json");
+    if (!res.ok) throw new Error("未找到市场数据文件");
+    const data = await res.json();
 
     // 填充表单
-    document.getElementById("dailyIdxClose").value = Math.round(idxClose * 10) / 10;
-    if (ma20) document.getElementById("dailyIdxMA20").value = Math.round(ma20 * 10) / 10;
-    document.getElementById("dailyLimitUp").value = limitUp;
-    document.getElementById("dailyLimitDown").value = limitDown;
-    document.getElementById("dailyTurnover").value = totalTurnover;
-    document.getElementById("dailyStrongSectors").value = strongSectors;
-    document.getElementById("dailyMarket").value = marketStatus;
+    document.getElementById("dailyDate").value = data.formatted_date || todayStr();
+    document.getElementById("dailyIdxClose").value = data.idx_close || "";
+    document.getElementById("dailyIdxMA20").value = data.ma20 || "";
+    document.getElementById("dailyLimitUp").value = data.limit_up || 0;
+    document.getElementById("dailyLimitDown").value = data.limit_down || 0;
+    document.getElementById("dailyTurnover").value = data.total_amount || "";
+    document.getElementById("dailyStrongSectors").value = (data.strong_sectors || []).join(", ");
+    document.getElementById("dailyMarket").value = data.market_status || "";
 
-    status.textContent = `✅ 获取成功！深证综指${Math.round(idxClose*10)/10}（${idxPct>=0?"+":""}${idxPct}%）, 20日线${Math.round(ma20*10)/10}, 涨停${limitUp}家, 跌停${limitDown}家, 成交${totalTurnover}亿`;
+    // 存主线板块数据
+    window._mainLineSectors = data.main_line || [];
+
+    status.textContent = `✅ 数据已加载！深证综指${data.idx_close}（${data.idx_pct >= 0 ? "+" : ""}${data.idx_pct}%）, 20日线${data.ma20}, 涨停${data.limit_up}家, 跌停${data.limit_down}家, 成交${data.total_amount}亿\n数据时间: ${data.updated_at}（交易日${data.trade_date}）`;
     status.style.background = "#d1fae5";
     status.style.color = "#065f46";
-
-    // 存主线板块数据供AI推荐使用
-    window._mainLineSectors = mainLineSectors;
 
     // 自动生成AI推荐
     setTimeout(() => generateAIRecommend(), 500);
 
   } catch(e) {
-    status.textContent = "❌ 获取失败: " + e.message;
+    status.textContent = "❌ 读取失败: " + e.message + "。可能数据还未采集，请先运行采集脚本。";
     status.style.background = "#fee2e2";
     status.style.color = "#991b1b";
     console.error(e);
@@ -1106,9 +996,7 @@ async function fetchMarketData() {
 
 // ========== 主线板块分析 ==========
 async function fetchMainLineSectors() {
-  // 如果已经有数据（从fetchMarketData获取），直接返回
   if (window._mainLineSectors) return window._mainLineSectors;
-  // 否则需要先调fetchMarketData
   return null;
 }
 
