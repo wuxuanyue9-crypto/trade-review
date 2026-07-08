@@ -1041,6 +1041,57 @@ async function fetchMarketData() {
   }
 }
 
+// ========== 主线板块分析 ==========
+async function fetchMainLineSectors() {
+  try {
+    // 东方财富push2接口 - 全A股，按成交额降序
+    // f6=成交额, f8=换手率, f12=代码, f14=名称, f100=行业
+    // 浏览器端可调用（有Referer和CORS）
+    const url = "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5500&po=1&np=1&fltt=2&invt=2&fid=f6&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f6,f8,f12,f14,f100";
+    const res = await fetch(url);
+    const data = await res.json();
+    const stocks = data?.data?.diff || [];
+    if (stocks.length === 0) return null;
+
+    // 计算成交额*换手率，取前1%
+    const enriched = stocks.map(s => ({
+      code: s.f12, name: s.f14,
+      amount: (s.f6 || 0) / 1e8, // 转为亿
+      turnover: s.f8 || 0,
+      score: ((s.f6 || 0) / 1e8) * (s.f8 || 0),
+      industry: s.f100 || "未分类"
+    }));
+
+    // 按score降序排序
+    enriched.sort((a, b) => b.score - a.score);
+
+    // 取前1%
+    const top1pct = enriched.slice(0, Math.max(10, Math.ceil(enriched.length * 0.01)));
+
+    // 按行业聚合
+    const sectorMap = {};
+    for (const s of top1pct) {
+      if (!sectorMap[s.industry]) {
+        sectorMap[s.industry] = { count: 0, totalScore: 0, stocks: [] };
+      }
+      sectorMap[s.industry].count++;
+      sectorMap[s.industry].totalScore += s.score;
+      sectorMap[s.industry].stocks.push(s);
+    }
+
+    // 转为数组并按总分降序
+    const sectors = Object.entries(sectorMap).map(([name, d]) => ({
+      name, count: d.count, totalScore: d.totalScore,
+      stocks: d.stocks.sort((a, b) => b.score - a.score)
+    })).sort((a, b) => b.totalScore - a.totalScore);
+
+    return sectors;
+  } catch(e) {
+    console.error("fetchMainLineSectors error:", e);
+    return null;
+  }
+}
+
 // ========== AI推荐 ==========
 function generateAIRecommend() {
   const idxClose = parseFloat(document.getElementById("dailyIdxClose").value);
@@ -1113,6 +1164,23 @@ function generateAIRecommend() {
     </ul>
   `;
 
+  // 主线板块分析（异步获取）
+  fetchMainLineSectors().then(sectors => {
+    let mainLineHTML = "";
+    if (sectors && sectors.length > 0) {
+      mainLineHTML = `<div style=\"margin-top:8px\">成交额×换手率前1%个股集中的板块（倒序）：<br><ul>`;
+      for (const s of sectors.slice(0, 8)) {
+        const topStocks = s.stocks.slice(0, 3).map(st => `${st.name}(${st.code})`).join("、");
+        mainLineHTML += `<li><strong>${s.name}</strong> — ${s.count}只，总分${s.totalScore.toFixed(0)}，代表：${topStocks}</li>`;
+      }
+      mainLineHTML += `</ul>老冯原则："盯着主线，1-2条主线，3-4个板块，50个自选股。"</div>`;
+    } else {
+      mainLineHTML = `（点击“自动获取”后自动计算）`;
+    }
+    const mainLineDiv = document.getElementById("mainLineAnalysis");
+    if (mainLineDiv) mainLineDiv.innerHTML = mainLineHTML;
+  });
+
   document.getElementById("aiRecommend").innerHTML = `
     <div class="ai-section">
       <div class="ai-label">大盘判断</div>
@@ -1127,6 +1195,10 @@ function generateAIRecommend() {
       <div class="ai-content">${sectorAdvice || "请填写强势板块数据"}</div>
     </div>
     <div class="ai-section">
+      <div class="ai-label">主线板块分析（成交额×换手率前1%集中度）</div>
+      <div class="ai-content" id="mainLineAnalysis">正在计算...</div>
+    </div>
+    <div class="ai-section">
       <div class="ai-label">综合建议</div>
       <div class="ai-content">${overallAdvice}</div>
     </div>
@@ -1135,6 +1207,22 @@ function generateAIRecommend() {
       <div class="ai-content">${focusStocks}</div>
     </div>
   `;
+  // 重新触发主线板块分析
+  fetchMainLineSectors().then(sectors => {
+    let mainLineHTML = "";
+    if (sectors && sectors.length > 0) {
+      mainLineHTML = `<div style="margin-top:8px">成交额×换手率前1%个股集中的板块（倒序）：<br><ul>`;
+      for (const s of sectors.slice(0, 8)) {
+        const topStocks = s.stocks.slice(0, 3).map(st => `${st.name}(${st.code})`).join("、");
+        mainLineHTML += `<li><strong>${s.name}</strong> — ${s.count}只，总分${s.totalScore.toFixed(0)}，代表：${topStocks}</li>`;
+      }
+      mainLineHTML += `</ul>老冯原则："盯着主线，1-2条主线，3-4个板块，50个自选股。"</div>`;
+    } else {
+      mainLineHTML = `获取失败或非交易日`;
+    }
+    const mainLineDiv = document.getElementById("mainLineAnalysis");
+    if (mainLineDiv) mainLineDiv.innerHTML = mainLineHTML;
+  });
 }
 
 // ========== 保存日复盘 ==========
