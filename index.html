@@ -293,7 +293,11 @@ tr:hover { background: #f9fafb; }
 
     <!-- 市场数据 -->
     <div class="card">
-      <div class="card-title"><span class="icon">📊</span> 市场数据</div>
+      <div class="card-title">
+        <span class="icon">📊</span> 市场数据
+        <button class="btn btn-outline" style="margin-left:auto;padding:6px 14px;font-size:13px" onclick="fetchMarketData()">⚡ 自动获取</button>
+      </div>
+      <div id="fetchStatus" style="display:none;padding:8px 12px;background:var(--primary-light);border-radius:8px;font-size:13px;color:var(--primary);margin-bottom:12px"></div>
       <div class="form-row">
         <div class="form-group">
           <label>日期</label>
@@ -945,6 +949,96 @@ function addWatchlist() {
   const div = document.createElement("div");
   div.innerHTML = html;
   document.getElementById("watchlistContainer").appendChild(div.firstElementChild);
+}
+
+// ========== 自动获取市场数据 ==========
+async function fetchMarketData() {
+  const status = document.getElementById("fetchStatus");
+  status.style.display = "block";
+  status.textContent = "⏳ 正在获取市场数据...";
+
+  try {
+    // 1. 深证综指（399106）实时行情
+    status.textContent = "⏳ 获取指数数据...";
+    const idxRes = await fetch("https://push2.eastmoney.com/api/qt/stock/get?secid=0.399106&fields=f43,f44,f45,f46,f170");
+    const idxData = await idxRes.json();
+    const idxClose = idxData?.data?.f43 / 100;
+    const idxHigh = idxData?.data?.f44 / 100;
+    const idxLow = idxData?.data?.f45 / 100;
+    const idxOpen = idxData?.data?.f46 / 100;
+    const idxPct = idxData?.data?.f170 / 100;
+
+    // 2. 获取深证综指近20日K线计算MA20
+    status.textContent = "⏳ 计算20日线...";
+    const klineRes = await fetch("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.399106&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=0&beg=20250601&end=20500101&lmt=30");
+    const klineData = await klineRes.json();
+    const klines = klineData?.data?.klines || [];
+    let ma20 = 0;
+    if (klines.length >= 20) {
+      const closes = klines.slice(-20).map(k => parseFloat(k.split(",")[2]));
+      ma20 = closes.reduce((a, b) => a + b, 0) / 20;
+    }
+
+    // 3. 涨停跌停家数 - 通过东方财富涨跌停统计
+    status.textContent = "⏳ 获取涨跌停数据...";
+    // 涨停板列表
+    const ztRes = await fetch("https://push2ex.eastmoney.com/getTopicZTPool?cb=&ut=7eea3edcaade7a1b4cdd60b9a5e9e25e&dpt=wz.ztzt&Ession=128424400&date=" + todayStr().replace(/-/g, "") + "&fields=f1,f2,f3,f4,f6,f8,f12,f14,f140,f141,f136,f152&sort=mbtype&order=1&pageSize=500&pageNo=1");
+    const ztData = await ztRes.json();
+    const limitUp = ztData?.data?.pool?.length || 0;
+
+    // 跌停板列表
+    const dtRes = await fetch("https://push2ex.eastmoney.com/getTopicDTPool?cb=&ut=7eea3edcaade7a1b4cdd60b9a5e9e0a9&dpt=wz.ztzt&date=" + todayStr().replace(/-/g, "") + "&fields=f1,f2,f3,f4,f6,f8,f12,f14,f140,f141,f136,f152&sort=mbtype&order=1&pageSize=500&pageNo=1");
+    const dtData = await dtRes.json();
+    const limitDown = dtData?.data?.pool?.length || 0;
+
+    // 4. 两市成交额 - 沪深合计
+    status.textContent = "⏳ 获取成交额...";
+    const shRes = await fetch("https://push2.eastmoney.com/api/qt/stock/get?secid=1.000001&fields=f46,f47,f48,f50,f43,f170");
+    const shData = await shRes.json();
+    const shTurnover = shData?.data?.f47 / 1e8; // 转为亿
+    const szRes = await fetch("https://push2.eastmoney.com/api/qt/stock/get?secid=0.399001&fields=f46,f47,f48,f50,f43,f170");
+    const szData = await szRes.json();
+    const szTurnover = szData?.data?.f47 / 1e8;
+    const totalTurnover = Math.round((shTurnover + szTurnover) * 10) / 10;
+
+    // 5. 强势板块 - 东方财富板块涨幅排行
+    status.textContent = "⏳ 获取板块数据...";
+    const sectorRes = await fetch("https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:2&fields=f2,f3,f12,f14");
+    const sectorData = await sectorRes.json();
+    const sectors = (sectorData?.data?.diff || []).map(d => d.f14).filter(s => s);
+    const strongSectors = sectors.join(", ");
+
+    // 6. 判断大盘状态
+    let marketStatus = "OK";
+    if (idxPct < -2 || (ma20 > 0 && idxClose < ma20)) {
+      marketStatus = "CAUTION";
+    }
+    if (idxPct < -3) {
+      marketStatus = "CRASH";
+    }
+
+    // 填充表单
+    if (idxClose) document.getElementById("dailyIdxClose").value = Math.round(idxClose * 10) / 10;
+    if (ma20) document.getElementById("dailyIdxMA20").value = Math.round(ma20 * 10) / 10;
+    document.getElementById("dailyLimitUp").value = limitUp;
+    document.getElementById("dailyLimitDown").value = limitDown;
+    if (totalTurnover > 0) document.getElementById("dailyTurnover").value = totalTurnover;
+    if (strongSectors) document.getElementById("dailyStrongSectors").value = strongSectors;
+    document.getElementById("dailyMarket").value = marketStatus;
+
+    status.textContent = `✅ 获取成功！深证综指${idxClose ? Math.round(idxClose*10)/10 : "-"}（${idxPct >= 0 ? "+" : ""}${idxPct}%）, 20日线${ma20 ? Math.round(ma20*10)/10 : "-"}, 涨停${limitUp}家, 跌停${limitDown}家, 成交${totalTurnover}亿`;
+    status.style.background = "#d1fae5";
+    status.style.color = "#065f46";
+
+    // 自动生成AI推荐
+    setTimeout(() => generateAIRecommend(), 500);
+
+  } catch(e) {
+    status.textContent = "❌ 获取失败: " + e.message + "（可能是非交易日或接口变化）";
+    status.style.background = "#fee2e2";
+    status.style.color = "#991b1b";
+    console.error(e);
+  }
 }
 
 // ========== AI推荐 ==========
