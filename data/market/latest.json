@@ -11,233 +11,364 @@
   "strong_sectors": [
     "半导体",
     "通信设备",
-    "元器件",
-    "IT设备",
-    "化工原料"
+    "计算机设备",
+    "光学光电子",
+    "IT服务Ⅱ"
   ],
   "main_line": [
     {
       "name": "半导体",
-      "l1": "",
-      "count": 21,
-      "totalScore": 282769.54,
+      "l1": "电子",
+      "count": 19,
+      "totalScore": 261911.91,
       "topStocks": [
         {
           "code": "603986.SH",
-          "name": "兆易创新",
+          "name": "603986.SH",
           "score": 33754.03
         },
         {
           "code": "600584.SH",
-          "name": "长电科技",
+          "name": "600584.SH",
           "score": 23639.56
         },
         {
           "code": "688981.SH",
-          "name": "中芯国际",
+          "name": "688981.SH",
           "score": 17103.32
         },
         {
           "code": "688008.SH",
-          "name": "澜起科技",
+          "name": "688008.SH",
           "score": 15765.7
         },
         {
           "code": "688802.SH",
-          "name": "沐曦股份",
+          "name": "688802.SH",
           "score": 15243.98
         }
       ]
     },
     {
       "name": "通信设备",
-      "l1": "",
-      "count": 10,
-      "totalScore": 120587.08,
+      "l1": "通信",
+      "count": 8,
+      "totalScore": 107281.2,
       "topStocks": [
         {
           "code": "000063.SZ",
-          "name": "中兴通讯",
+          "name": "000063.SZ",
           "score": 27921.87
         },
         {
           "code": "600487.SH",
-          "name": "亨通光电",
+          "name": "600487.SH",
           "score": 18044.51
         },
         {
           "code": "600522.SH",
-          "name": "中天科技",
+          "name": "600522.SH",
           "score": 15370.46
         },
         {
           "code": "300308.SZ",
-          "name": "中际旭创",
+          "name": "300308.SZ",
           "score": 13453.77
         },
         {
           "code": "300502.SZ",
-          "name": "新易盛",
+          "name": "300502.SZ",
           "score": 10238.6
         }
       ]
     },
     {
-      "name": "元器件",
-      "l1": "",
-      "count": 5,
-      "totalScore": 86982.35,
-      "topStocks": [
-        {
-          "code": "000725.SZ",
-          "name": "京东方A",
-          "score": 32307.25
-        },
-        {
-          "code": "002384.SZ",
-          "name": "东山精密",
-          "score": 22517.82
-        },
-        {
-          "code": "000021.SZ",
-          "name": "深科技",
-          "score": 11851.26
-        },
-        {
-          "code": "001399.SZ",
-          "name": "惠科股份",
-          "score": 10594.87
-        },
-        {
-          "code": "300475.SZ",
-          "name": "香农芯创",
-          "score": 9711.15
-        }
-      ]
-    },
-    {
-      "name": "IT设备",
-      "l1": "",
-      "count": 4,
-      "totalScore": 69017.14,
+      "name": "计算机设备",
+      "l1": "计算机",
+      "count": 3,
+      "totalScore": 46172.02,
       "topStocks": [
         {
           "code": "000977.SZ",
-          "name": "浪潮信息",
+          "name": "000977.SZ",
           "score": 27567.43
         },
         {
-          "code": "000938.SZ",
-          "name": "紫光股份",
-          "score": 22845.12
-        },
-        {
           "code": "603019.SH",
-          "name": "中科曙光",
+          "name": "603019.SH",
           "score": 10693.47
         },
         {
           "code": "000066.SZ",
-          "name": "中国长城",
+          "name": "000066.SZ",
           "score": 7911.12
         }
       ]
     },
     {
-      "name": "化工原料",
-      "l1": "",
+      "name": "光学光电子",
+      "l1": "电子",
+      "count": 2,
+      "totalScore": 42902.12,
+      "topStocks": [
+        {
+          "code": "000725.SZ",
+          "name": "000725.SZ",
+          "score": 32307.25
+        },
+        {
+          "code": "001399.SZ",
+          "name": "001399.SZ",
+          "score": 10594.87
+        }
+      ]
+    },
+    {
+      "name": "IT服务Ⅱ",
+      "l1": "计算机",
+      "count": 2,
+      "totalScore": 31764.9,
+      "topStocks": [
+        {
+          "code": "000938.SZ",
+          "name": "000938.SZ",
+          "score": 22845.12
+        },
+        {
+          "code": "300017.SZ",
+          "name": "300017.SZ",
+          "score": 8919.78
+        }
+      ]
+    },
+    {
+      "name": "元件",
+      "l1": "电子",
+      "count": 1,
+      "totalScore": 22517.82,
+      "topStocks": [
+        {
+          "code": "002384.SZ",
+          "name": "002384.SZ",
+          "score": 22517.82
+        }
+      ]
+    },
+    {
+      "name": "化学制品",
+      "l1": "基础化工",
       "count": 2,
       "totalScore": 22321.4,
       "topStocks": [
         {
           "code": "002407.SZ",
-          "name": "多氟多",
+          "name": "002407.SZ",
           "score": 11771.8
         },
         {
           "code": "300821.SZ",
-          "name": "东岳硅材",
+          "name": "300821.SZ",
           "score": 10549.6
         }
       ]
     },
     {
-      "name": "玻璃",
-      "l1": "",
+      "name": "玻璃玻纤",
+      "l1": "建筑材料",
       "count": 2,
       "totalScore": 18158.8,
       "topStocks": [
         {
           "code": "301526.SZ",
-          "name": "国际复材",
+          "name": "301526.SZ",
           "score": 9264.78
         },
         {
           "code": "600176.SH",
-          "name": "中国巨石",
+          "name": "600176.SH",
           "score": 8894.02
         }
       ]
     },
     {
-      "name": "电气设备",
-      "l1": "",
-      "count": 2,
-      "totalScore": 16731.15,
-      "topStocks": [
-        {
-          "code": "300390.SZ",
-          "name": "天华新能",
-          "score": 9990.18
-        },
-        {
-          "code": "002851.SZ",
-          "name": "麦格米特",
-          "score": 6740.97
-        }
-      ]
-    },
-    {
-      "name": "新型电力",
-      "l1": "",
-      "count": 1,
-      "totalScore": 16244.77,
-      "topStocks": [
-        {
-          "code": "001248.SZ",
-          "name": "华润新能源",
-          "score": 16244.77
-        }
-      ]
-    },
-    {
-      "name": "机械基件",
-      "l1": "",
+      "name": "自动化设备",
+      "l1": "机械设备",
       "count": 1,
       "totalScore": 15781.0,
       "topStocks": [
         {
           "code": "002747.SZ",
-          "name": "埃斯顿",
+          "name": "002747.SZ",
           "score": 15781.0
         }
       ]
     },
     {
-      "name": "矿物制品",
-      "l1": "",
+      "name": "通用设备",
+      "l1": "机械设备",
       "count": 1,
       "totalScore": 14331.73,
       "topStocks": [
         {
           "code": "600172.SH",
-          "name": "黄河旋风",
+          "name": "600172.SH",
           "score": 14331.73
         }
       ]
     }
   ],
-  "main_line_l3": [],
+  "main_line_l3": [
+    {
+      "name": "其他计算机设备",
+      "l2": "计算机设备",
+      "count": 3,
+      "totalScore": 46172.02,
+      "topStocks": [
+        {
+          "code": "000977.SZ",
+          "name": "000977.SZ",
+          "score": 27567.43
+        },
+        {
+          "code": "603019.SH",
+          "name": "603019.SH",
+          "score": 10693.47
+        },
+        {
+          "code": "000066.SZ",
+          "name": "000066.SZ",
+          "score": 7911.12
+        }
+      ]
+    },
+    {
+      "name": "IT服务Ⅲ",
+      "l2": "IT服务Ⅱ",
+      "count": 2,
+      "totalScore": 31764.9,
+      "topStocks": [
+        {
+          "code": "000938.SZ",
+          "name": "000938.SZ",
+          "score": 22845.12
+        },
+        {
+          "code": "300017.SZ",
+          "name": "300017.SZ",
+          "score": 8919.78
+        }
+      ]
+    },
+    {
+      "name": "玻纤制造",
+      "l2": "玻璃玻纤",
+      "count": 2,
+      "totalScore": 18158.8,
+      "topStocks": [
+        {
+          "code": "301526.SZ",
+          "name": "301526.SZ",
+          "score": 9264.78
+        },
+        {
+          "code": "600176.SH",
+          "name": "600176.SH",
+          "score": 8894.02
+        }
+      ]
+    },
+    {
+      "name": "机器人",
+      "l2": "自动化设备",
+      "count": 1,
+      "totalScore": 15781.0,
+      "topStocks": [
+        {
+          "code": "002747.SZ",
+          "name": "002747.SZ",
+          "score": 15781.0
+        }
+      ]
+    },
+    {
+      "name": "磨具磨料",
+      "l2": "通用设备",
+      "count": 1,
+      "totalScore": 14331.73,
+      "topStocks": [
+        {
+          "code": "600172.SH",
+          "name": "600172.SH",
+          "score": 14331.73
+        }
+      ]
+    },
+    {
+      "name": "工程咨询服务Ⅲ",
+      "l2": "工程咨询服务Ⅱ",
+      "count": 1,
+      "totalScore": 14190.62,
+      "topStocks": [
+        {
+          "code": "600667.SH",
+          "name": "600667.SH",
+          "score": 14190.62
+        }
+      ]
+    },
+    {
+      "name": "游戏Ⅲ",
+      "l2": "游戏Ⅱ",
+      "count": 1,
+      "totalScore": 12003.79,
+      "topStocks": [
+        {
+          "code": "300418.SZ",
+          "name": "300418.SZ",
+          "score": 12003.79
+        }
+      ]
+    },
+    {
+      "name": "氟化工",
+      "l2": "化学制品",
+      "count": 1,
+      "totalScore": 11771.8,
+      "topStocks": [
+        {
+          "code": "002407.SZ",
+          "name": "002407.SZ",
+          "score": 11771.8
+        }
+      ]
+    },
+    {
+      "name": "有机硅",
+      "l2": "化学制品",
+      "count": 1,
+      "totalScore": 10549.6,
+      "topStocks": [
+        {
+          "code": "300821.SZ",
+          "name": "300821.SZ",
+          "score": 10549.6
+        }
+      ]
+    },
+    {
+      "name": "电池化学品",
+      "l2": "电池",
+      "count": 1,
+      "totalScore": 9990.18,
+      "topStocks": [
+        {
+          "code": "300390.SZ",
+          "name": "300390.SZ",
+          "score": 9990.18
+        }
+      ]
+    }
+  ],
   "stock_count": 5520,
-  "updated_at": "2026-07-09 21:25:12"
+  "updated_at": "2026-07-09 21:27:15"
 }
