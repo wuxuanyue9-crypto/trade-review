@@ -1,232 +1,243 @@
 {
-  "trade_date": "20260708",
-  "formatted_date": "2026-07-08",
-  "idx_close": 2650.43,
-  "idx_pct": -1.97,
-  "ma20": 2787.94,
+  "trade_date": "20260709",
+  "formatted_date": "2026-07-09",
+  "idx_close": 2709.18,
+  "idx_pct": 2.22,
+  "ma20": 2788.97,
   "market_status": "CAUTION",
-  "total_amount": 258259.2,
-  "limit_up": 83,
-  "limit_down": 98,
+  "total_amount": 293225.7,
+  "limit_up": 155,
+  "limit_down": 29,
   "strong_sectors": [
     "半导体",
+    "通信设备",
     "元器件",
     "IT设备",
-    "通信设备",
     "化工原料"
   ],
   "main_line": [
     {
       "name": "半导体",
-      "count": 23,
-      "totalScore": 237013.94,
+      "l1": "",
+      "count": 21,
+      "totalScore": 282769.54,
       "topStocks": [
         {
           "code": "603986.SH",
           "name": "兆易创新",
-          "score": 30536.12
-        },
-        {
-          "code": "002185.SZ",
-          "name": "华天科技",
-          "score": 29936.07
+          "score": 33754.03
         },
         {
           "code": "600584.SH",
           "name": "长电科技",
-          "score": 23055.12
+          "score": 23639.56
         },
         {
-          "code": "600206.SH",
-          "name": "有研新材",
-          "score": 12832.67
+          "code": "688981.SH",
+          "name": "中芯国际",
+          "score": 17103.32
         },
         {
-          "code": "600667.SH",
-          "name": "太极实业",
-          "score": 12591.11
-        }
-      ]
-    },
-    {
-      "name": "元器件",
-      "count": 8,
-      "totalScore": 83863.37,
-      "topStocks": [
-        {
-          "code": "000725.SZ",
-          "name": "京东方A",
-          "score": 23807.97
+          "code": "688008.SH",
+          "name": "澜起科技",
+          "score": 15765.7
         },
         {
-          "code": "002384.SZ",
-          "name": "东山精密",
-          "score": 15836.66
-        },
-        {
-          "code": "001399.SZ",
-          "name": "惠科股份",
-          "score": 9871.9
-        },
-        {
-          "code": "002137.SZ",
-          "name": "实益达",
-          "score": 8902.42
-        },
-        {
-          "code": "000021.SZ",
-          "name": "深科技",
-          "score": 8739.19
-        }
-      ]
-    },
-    {
-      "name": "IT设备",
-      "count": 3,
-      "totalScore": 44111.54,
-      "topStocks": [
-        {
-          "code": "000938.SZ",
-          "name": "紫光股份",
-          "score": 27542.63
-        },
-        {
-          "code": "603019.SH",
-          "name": "中科曙光",
-          "score": 9809.79
-        },
-        {
-          "code": "000066.SZ",
-          "name": "中国长城",
-          "score": 6759.12
+          "code": "688802.SH",
+          "name": "沐曦股份",
+          "score": 15243.98
         }
       ]
     },
     {
       "name": "通信设备",
-      "count": 4,
-      "totalScore": 33567.66,
+      "l1": "",
+      "count": 10,
+      "totalScore": 120587.08,
       "topStocks": [
         {
-          "code": "300308.SZ",
-          "name": "中际旭创",
-          "score": 10384.87
+          "code": "000063.SZ",
+          "name": "中兴通讯",
+          "score": 27921.87
         },
         {
           "code": "600487.SH",
           "name": "亨通光电",
-          "score": 8428.65
-        },
-        {
-          "code": "300502.SZ",
-          "name": "新易盛",
-          "score": 8177.15
+          "score": 18044.51
         },
         {
           "code": "600522.SH",
           "name": "中天科技",
-          "score": 6576.99
+          "score": 15370.46
+        },
+        {
+          "code": "300308.SZ",
+          "name": "中际旭创",
+          "score": 13453.77
+        },
+        {
+          "code": "300502.SZ",
+          "name": "新易盛",
+          "score": 10238.6
+        }
+      ]
+    },
+    {
+      "name": "元器件",
+      "l1": "",
+      "count": 5,
+      "totalScore": 86982.35,
+      "topStocks": [
+        {
+          "code": "000725.SZ",
+          "name": "京东方A",
+          "score": 32307.25
+        },
+        {
+          "code": "002384.SZ",
+          "name": "东山精密",
+          "score": 22517.82
+        },
+        {
+          "code": "000021.SZ",
+          "name": "深科技",
+          "score": 11851.26
+        },
+        {
+          "code": "001399.SZ",
+          "name": "惠科股份",
+          "score": 10594.87
+        },
+        {
+          "code": "300475.SZ",
+          "name": "香农芯创",
+          "score": 9711.15
+        }
+      ]
+    },
+    {
+      "name": "IT设备",
+      "l1": "",
+      "count": 4,
+      "totalScore": 69017.14,
+      "topStocks": [
+        {
+          "code": "000977.SZ",
+          "name": "浪潮信息",
+          "score": 27567.43
+        },
+        {
+          "code": "000938.SZ",
+          "name": "紫光股份",
+          "score": 22845.12
+        },
+        {
+          "code": "603019.SH",
+          "name": "中科曙光",
+          "score": 10693.47
+        },
+        {
+          "code": "000066.SZ",
+          "name": "中国长城",
+          "score": 7911.12
         }
       ]
     },
     {
       "name": "化工原料",
-      "count": 3,
-      "totalScore": 26787.11,
+      "l1": "",
+      "count": 2,
+      "totalScore": 22321.4,
       "topStocks": [
         {
           "code": "002407.SZ",
           "name": "多氟多",
-          "score": 12951.88
+          "score": 11771.8
         },
         {
           "code": "300821.SZ",
           "name": "东岳硅材",
-          "score": 7614.01
-        },
-        {
-          "code": "920189.BJ",
-          "name": "康美特",
-          "score": 6221.22
+          "score": 10549.6
         }
       ]
     },
     {
       "name": "玻璃",
+      "l1": "",
       "count": 2,
-      "totalScore": 15263.22,
+      "totalScore": 18158.8,
       "topStocks": [
         {
           "code": "301526.SZ",
           "name": "国际复材",
-          "score": 9502.94
+          "score": 9264.78
         },
         {
           "code": "600176.SH",
           "name": "中国巨石",
-          "score": 5760.28
-        }
-      ]
-    },
-    {
-      "name": "新型电力",
-      "count": 1,
-      "totalScore": 14722.94,
-      "topStocks": [
-        {
-          "code": "001248.SZ",
-          "name": "华润新能源",
-          "score": 14722.94
-        }
-      ]
-    },
-    {
-      "name": "矿物制品",
-      "count": 1,
-      "totalScore": 14702.6,
-      "topStocks": [
-        {
-          "code": "600172.SH",
-          "name": "黄河旋风",
-          "score": 14702.6
-        }
-      ]
-    },
-    {
-      "name": "互联网",
-      "count": 2,
-      "totalScore": 13851.64,
-      "topStocks": [
-        {
-          "code": "300418.SZ",
-          "name": "昆仑万维",
-          "score": 7829.83
-        },
-        {
-          "code": "002354.SZ",
-          "name": "天娱数科",
-          "score": 6021.81
+          "score": 8894.02
         }
       ]
     },
     {
       "name": "电气设备",
+      "l1": "",
       "count": 2,
-      "totalScore": 12515.6,
+      "totalScore": 16731.15,
       "topStocks": [
         {
           "code": "300390.SZ",
           "name": "天华新能",
-          "score": 7574.59
+          "score": 9990.18
         },
         {
-          "code": "600110.SH",
-          "name": "诺德股份",
-          "score": 4941.01
+          "code": "002851.SZ",
+          "name": "麦格米特",
+          "score": 6740.97
+        }
+      ]
+    },
+    {
+      "name": "新型电力",
+      "l1": "",
+      "count": 1,
+      "totalScore": 16244.77,
+      "topStocks": [
+        {
+          "code": "001248.SZ",
+          "name": "华润新能源",
+          "score": 16244.77
+        }
+      ]
+    },
+    {
+      "name": "机械基件",
+      "l1": "",
+      "count": 1,
+      "totalScore": 15781.0,
+      "topStocks": [
+        {
+          "code": "002747.SZ",
+          "name": "埃斯顿",
+          "score": 15781.0
+        }
+      ]
+    },
+    {
+      "name": "矿物制品",
+      "l1": "",
+      "count": 1,
+      "totalScore": 14331.73,
+      "topStocks": [
+        {
+          "code": "600172.SH",
+          "name": "黄河旋风",
+          "score": 14331.73
         }
       ]
     }
   ],
-  "stock_count": 5518,
-  "updated_at": "2026-07-09 16:09:49"
+  "main_line_l3": [],
+  "stock_count": 5520,
+  "updated_at": "2026-07-09 21:25:12"
 }
