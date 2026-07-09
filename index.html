@@ -978,6 +978,7 @@ async function fetchMarketData() {
 
     // 存主线板块数据
     window._mainLineSectors = data.main_line || [];
+    window._mainLineSectorsL3 = data.main_line_l3 || [];
 
     status.textContent = `✅ 数据已加载！深证综指${data.idx_close}（${data.idx_pct >= 0 ? "+" : ""}${data.idx_pct}%）, 20日线${data.ma20}, 涨停${data.limit_up}家, 跌停${data.limit_down}家, 成交${data.total_amount}亿\n数据时间: ${data.updated_at}（交易日${data.trade_date}）`;
     status.style.background = "#d1fae5";
@@ -1077,13 +1078,26 @@ function generateAIRecommend() {
   let mainLineHTML = "";
   const sectors = window._mainLineSectors;
   if (sectors && sectors.length > 0) {
-    mainLineHTML = `<div style="margin-top:8px">成交额×换手率前1%个股集中的板块（倒序）：<br><ul>`;
+    // 申万二级
+    mainLineHTML = `<div style="margin-top:8px"><strong>申万二级（大类）</strong><br>成交额×换手率前1%个股集中的板块（倒序）：<br><ul>`;
     for (const s of sectors.slice(0, 8)) {
       const stocks = s.topStocks || s.stocks || [];
       const topStocks = stocks.slice(0, 3).map(st => `${st.name}(${st.code})`).join("、");
-      mainLineHTML += `<li><strong>${s.name}</strong> — ${s.count}只，总分${Math.round(s.totalScore)}，代表：${topStocks}</li>`;
+      mainLineHTML += `<li><strong>${s.l1 || ""}/${s.name}</strong> — ${s.count}只，总分${Math.round(s.totalScore)}，代表：${topStocks}</li>`;
     }
-    mainLineHTML += `</ul>老冯原则："盯着主线，1-2条主线，3-4个板块，50个自选股。"</div>`;
+    mainLineHTML += `</ul>`;
+    // 申万三级
+    const sectorsL3 = window._mainLineSectorsL3 || [];
+    if (sectorsL3.length > 0) {
+      mainLineHTML += `<strong>申万三级（细分）</strong><br><ul>`;
+      for (const s of sectorsL3.slice(0, 8)) {
+        const stocks = s.topStocks || s.stocks || [];
+        const topStocks = stocks.slice(0, 3).map(st => `${st.name}(${st.code})`).join("、");
+        mainLineHTML += `<li><strong>${s.l2 || ""}/${s.name}</strong> — ${s.count}只，总分${Math.round(s.totalScore)}，代表：${topStocks}</li>`;
+      }
+      mainLineHTML += `</ul>`;
+    }
+    mainLineHTML += `老冯原则："盯着主线，1-2条主线，3-4个板块，50个自选股。"</div>`;
   } else {
     mainLineHTML = `（点击"自动获取"后自动加载）`;
   }
